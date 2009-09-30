@@ -1,0 +1,17 @@
+[%# A template for a sadi service signature
+    ===========================
+
+    Expected/recognized parameters:
+      url      - the service url
+      inClass  - the input class uri
+      outClass  - the output class uri
+-%]
+<rdf:RDF
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:j.0="http://sadiframework.org/examples/regression.owl#" >
+   <rdf:Description rdf:about="[% inClass %]">
+     <rdf:type rdf:resource="[% outClass %]"/>
+     <rdfs:isDefinedBy rdf:resource="[% url %]"/>
+  </rdf:Description>
+</rdf:RDF>

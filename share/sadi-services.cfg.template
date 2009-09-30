@@ -1,0 +1,28 @@
+# ---------------------------------------------------------------
+# This is a configuration file for SADI services.
+# Copy it into file 'sadi-services.cfg' and edit it to your needs.
+#
+# Your new copy has to be in a directory define by an environment
+# variable SADI_CFG_DIR, or in any directory defined in the
+# Perl's @INC array. Keeping it in this directory is usually fine
+# because the SADI code must be found by Perl anyway.
+#
+# $Id: sadi-services.cfg.template,v 1.3 2009-09-03 18:56:30 ubuntu Exp $
+# Contact: Edward Kawas <edward.kawas+sadi@gmail.com>
+# ---------------------------------------------------------------
+
+[generators]
+outdir = @GENERATED_DIR@
+impl.outdir = @SERVICES_DIR@
+impl.package.prefix = Service
+impl.definitions    = @DEFINITIONS_DIR@
+impl.home = @HOME_DIR@
+
+[async]
+tmp = @ASYNC_OUTDIR@
+
+[log]
+config = @LOG4PERL_FILE@
+#file = @LOGFILE@
+#level = info
+#pattern = "%d (%r) %p> [%x] %F{1}:%L - %m%n"

@@ -1,0 +1,115 @@
+#!/usr/bin/perl -w
+# This is a CGI-BIN script, invoked by a web server when an HTTP
+# POST comes in, dispatching requests to the appropriate module
+# (SADI web service).
+#
+# It includes some hard-coded paths - they were added during the
+# generate service call.
+#
+# $Id: service-cgi-async.tt,v 1.17 2009-09-18 17:17:38 ubuntu Exp $
+# Contact: Edward Kawas <edward.kawas@gmail.com>
+# ---------------------------------------------------------------
+[%# A template for a sadi service.
+    ===================================
+
+    Expected/recognized parameters:
+      obj            ... a service definition, type SADI::Service::Instance
+      services_dir   ... the directory to the impl files
+      generated_dir  ... the directory to the 'generated' dir
+      home_dir       ... the SADI-Perl user home directory
+-%]
+
+#-----------------------------------------------------------------
+# Authority:    [% obj.Authority %]
+# Service name: [% obj.ServiceName %]
+# Generated:    [% USE Date (format = '%d-%b-%Y %H:%M:%S %Z') %][% Date.format %]
+# Contact: Edward Kawas <edward.kawas@gmail.com>
+#-----------------------------------------------------------------
+
+use strict;
+
+
+# --- during service generation --- 
+# leave at the top!
+use lib '[% generated_dir %]';
+use lib '[% services_dir %]';
+use lib '[% home_dir %]';
+
+use CGI;
+use CGI::Carp qw(fatalsToBrowser);
+
+use SADI::Service::Instance;
+use SADI::RDF::Core;
+use SADI::Generators::GenServices;
+use SADI::FileStore;
+
+# limit the max size of a post - change it as you see fit
+$CGI::POST_MAX=1024 * 1024 * 10;  # max 10MB posts
+
+# the suggested wait time for polling in milliseconds
+my $SUGGESTED_WAIT_TIME = 2*60*1000;
+
+# here we require the service module and add it to ISA hierarchy
+use base 'Service::[% obj.ServiceName %]';
+
+# get the cgi variable
+my $q = new CGI;
+
+# if this is a GET, send the service interface
+if ($ENV{REQUEST_METHOD} eq 'GET') {
+    # print the interface unless we are polling
+    do {
+        # send the signature for this service
+        # instantiate a new SADI::RDF::Core object
+        my $core = SADI::RDF::Core->new;
+        # set the Instance for $core
+        $core->Signature(__PACKAGE__->get_service_signature('[% obj.ServiceName %]'));
+        print $q->header(-type=>'text/xml');
+        print $core->getServiceInterface();
+        exit();
+    } unless $q->param('poll');
+    
+    # we are polling ... 
+    # $poll is the id for our file store
+    my $poll = $q->param('poll');
+    $ENV{SADI_UID} = $poll;
+    my $completed;
+    eval {$completed = __PACKAGE__->completed($poll);};
+    # do something if $@
+    print $q->header(-status=>"404 nothing found for the given polling parameter" ) if $@;
+    exit if $@;
+    if ($completed) {
+        # we are done
+        eval {$completed = __PACKAGE__->retrieve($poll);};
+        unless ($@) {
+          print $q->header(-type=>'text/xml');
+          print $completed;
+          exit;
+        }
+    } else {
+        # still waiting
+        my $signature = __PACKAGE__->get_service_signature('[% obj.ServiceName %]');
+        print $q->redirect(-uri=>$signature->URL . "?poll=$poll", -status=>302, -pragma=>"sadi-please-wait = $SUGGESTED_WAIT_TIME");
+        #print $q->header(-type=>'text/xml', -sadi_please_wait=>$SUGGESTED_WAIT_TIME);
+        #print __PACKAGE__->get_polling_rdf();
+        exit;
+    }
+} else {
+    # call the service
+
+    # get the data from the 'data' parameter or from POSTDATA
+    my $data = $q->param('data') || $q->param('POSTDATA') || "";
+
+    # set the UID
+    my $uid = SADI::FileStore->new(ServiceName => "[% obj.ServiceName %]")->generate_uid();
+    $ENV{SADI_UID} = $uid;
+
+    # call the service
+    __PACKAGE__->[% obj.ServiceName %](
+       $data
+    );
+   print __PACKAGE__->get_polling_rdf();
+}
+
+__END__
+

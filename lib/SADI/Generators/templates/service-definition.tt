@@ -1,0 +1,24 @@
+# make sure to escape the chars:
+#    #,= with a \, for instance \# 
+# new lines in a property value are not supported yet!
+
+# dont change the service name!
+# if you find that you need to modify
+# the service name, regenerate a new file
+# and remove this one!
+ServiceName = [% name %]
+
+# modify the values below as you see fit.
+ServiceType = http://someontology.org/services/sometype
+InputClass = http://someontology.org/datatypes\#Input1
+OutputClass = http://someontology.org/datatypes\#Output1
+Description = A implementation of the '[% name %]' service
+UniqueIdentifier = urn:lsid:myservices:[% name %]
+Authority = authority.for.[% name %]
+Authoritative = 1
+Provider = myaddress@organization.org
+ServiceURI = http://localhost/cgi-bin/[% name %]
+URL = http://localhost/cgi-bin/[% name %]
+SignatureURL = http://localhost/cgi-bin/[% name %]
+ 
+ 

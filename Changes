@@ -1,0 +1,14 @@
+Revision history for Perl extension SADI.
+
+.92
+   - updated the makefile
+   - added some new documentation
+   
+.91
+    - added async service support
+    - some minor bug fixes
+
+.90  Sept 01 2009
+	- original version
+
+

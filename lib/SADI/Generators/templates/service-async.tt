@@ -1,0 +1,138 @@
+[%# A template for a service implementation code
+      (an empty implementation of a service)
+    ============================================
+
+    Expected/recognized parameters:
+
+      base         ... a service base definition
+                       (type SADI:::Service::Instance)
+	  module_name  ... a scalar string representing the module name
+      impl         ... a service implementation details
+                       (type HASH)
+      static_impl  ... if true, the static option will be enabled
+      ref          ... a CODE returning ref() of the given argument
+-%]
+#-----------------------------------------------------------------
+# Service name: [% base.ServiceName %]
+# Authority:    [% base.Authority %]
+# Created:      [% USE Date (format = '%d-%b-%Y %H:%M:%S %Z') %][% Date.format %]
+# Contact:      [% base.Provider %]
+# Description:  [% USE description = String (base.Description) %]
+#               [%- description.replace("\n", "\n#\t") %]
+#-----------------------------------------------------------------
+
+package [% impl.package %];
+
+use FindBin qw( $Bin );
+use lib $Bin;
+
+#-----------------------------------------------------------------
+# This is a mandatory section - but you can still choose one of
+# the two options (keep one and commented out the other):
+#-----------------------------------------------------------------
+use SADI::Base;
+[%- IF static_impl == 1 %][% opt1 = '#'; opt2 = '' %][% ELSE %][% opt1 = ''; opt2 = '#' %][% END %]
+# --- (1) this option loads dynamically everything
+[% opt1 %]BEGIN {
+[% opt1 %]    use SADI::Generators::GenServices;
+[% opt1 %]    new SADI::Generators::GenServices->async_load(
+[% opt1 %]	 service_names => ['[% base.ServiceName %]']);
+[% opt1 %]}
+
+# --- (2) this option uses pre-generated module
+#  You can generate the module by calling a script:
+#    sadi-generate-services -B [% base.ServiceName %]
+#  then comment out the whole option above, and uncomment
+#  the following line (and make sure that Perl can find it):
+[% opt2 %]use [% module_name %];
+
+# (this to stay here with any of the options above)
+use vars qw( @ISA );
+@ISA = qw( [% module_name %] );
+use strict;
+
+# add vocabulary use statements
+use SADI::RDF::Predicates::DC_PROTEGE;
+use SADI::RDF::Predicates::FETA;
+use SADI::RDF::Predicates::OMG_LSID;
+use SADI::RDF::Predicates::OWL;
+use SADI::RDF::Predicates::RDF;
+use SADI::RDF::Predicates::RDFS;
+
+#-----------------------------------------------------------------
+# process_it
+#    This method is called for every client request.
+#    Input data are in $values of type RDF::Core::Resource.
+#    You will need to add output via $core->addOutputData()
+#        this method adds nodes to the final output.
+#        param keys: node, value, predicate
+#-----------------------------------------------------------------
+sub process_it {
+    my ($self, $values, $core) = @_;
+    # empty data, then return
+    return unless $values;
+
+    my @inputs = @$values;
+    # iterate over each input
+    foreach my $input (@inputs) {
+    	# NOTE: this fills in the log file
+    	$LOG->info ("Input data (" 
+    		. $input->getURI ? $input->getURI : "no_uri" 
+    		. ")"
+    		. $input->getLocalValue ? ":\n" . $input->getLocalValue : ""
+    		."")
+      		if defined $input;
+    	# do something with $input ... (sorry, can't help with that)
+	
+        # fill in the output nodes - this is what you need to do!
+        foreach my $output (0..2) {
+        # for example ...
+         	$core->addOutputData(
+        		node => $input->getURI,
+                value => "$output",
+        	    predicate => "http://sadiframework.org/ontologies/predicates.owl#somePredicate$output"
+        	);
+
+        	# store takes in $core
+        	$self->store($core);
+        	# mimic long running service - sleep 15 seconds per addition of output
+        	sleep(15);
+        }
+    }
+}
+
+1;
+__END__
+
+=head1 NAME
+
+[% impl.package %] - a SADI service
+
+=head1 SYNOPSIS
+
+ # the only thing that you need to do is provide your
+ # business logic in process_it()!
+ #
+ # This method consumes an array reference of input data
+ # (RDF::Core::Resource),$values, and a reference to 
+ # a SADI::RDF::Core object, $core.
+ #
+ # Basically, iterate over the the inputs, do your thing
+ # and then $core->addOutputData().
+ #
+ # Since this is an asynchronous implementation of a SADI
+ # web service, I am assuming that your task takes a while
+ # to run. So to save what you have so far, do store($core).
+ # 
+
+=head1 DESCRIPTION
+
+[% base.Description %]
+
+=head1 CONTACT
+
+B<Authority>: [% base.Authority %]
+
+B<Email>: [% base.Provider %]
+
+=cut
