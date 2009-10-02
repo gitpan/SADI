@@ -4,7 +4,7 @@
 #         Martin Senger <martin.senger@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: String.pm,v 1.1 2009-08-25 14:30:49 ubuntu Exp $
+# $Id: String.pm,v 1.2 2009-10-02 15:54:02 ubuntu Exp $
 #-----------------------------------------------------------------
 
 package SADI::Data::String;
@@ -13,11 +13,11 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.1 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
-SADI::Data::String - A primite SADI data type for strings
+SADI::Data::String - A primitive SADI data type for strings
 
 =head1 SYNOPSIS
 

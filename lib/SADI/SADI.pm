@@ -3,7 +3,7 @@
 # Author: Edward Kawas
 # For copyright and disclaimer see below.
 #
-# $Id: SADI.pm,v 1.21 2009-09-22 14:08:06 ubuntu Exp $
+# $Id: SADI.pm,v 1.22 2009-10-02 15:53:46 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::SADI;
 use strict 'vars';
@@ -13,7 +13,7 @@ use vars qw{$VERSION};
 
 BEGIN {
 	use vars qw{@ISA @EXPORT @EXPORT_OK};
-	$VERSION = sprintf "%d.%02d", q$Revision: 1.21 $ =~ /: (\d+)\.(\d+)/;
+	$VERSION = sprintf "%d.%02d", q$Revision: 1.22 $ =~ /: (\d+)\.(\d+)/;
 	*SADI::SADI::VERSION = *VERSION;
 }
 
@@ -23,7 +23,7 @@ __END__
 
 =head1 NAME
 
-SADI - Perl extension for the automatic generation of SADI web services
+SADI - !!Look Here First!! Perl extension for the automatic generation of SADI web services
 
 =head1 SYNOPSIS
 
@@ -1131,7 +1131,7 @@ re-create it. Here is a whole script (for HelloSadiWorld):
 # It includes some hard-coded paths - they were added during the
 # generate service call.
 #
-# $Id: SADI.pm,v 1.21 2009-09-22 14:08:06 ubuntu Exp $
+# $Id: SADI.pm,v 1.22 2009-10-02 15:53:46 ubuntu Exp $
 # Contact: Edward Kawas &lt;edward.kawas@gmail.com&gt;
 # ---------------------------------------------------------------
 
@@ -1475,11 +1475,30 @@ Please visit the SADI website at L<http://sadiframework.org>!
 
 =head1 COPYRIGHT
 
-Copyright (c) 2009 Edward Kawas.
+Copyright (c) 2009, Mark Wilkinson
+All rights reserved.
 
-This module is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
 
-This software is provided "as is" without warranty of any kind.
+    * Redistributions of source code must retain the above copyright notice, 
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+    * Neither the name of the University of British Columbia nor the names of 
+      its contributors may be used to endorse or promote products derived from 
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+OF SUCH DAMAGE.
 
 =cut

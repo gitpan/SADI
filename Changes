@@ -1,5 +1,13 @@
 Revision history for Perl extension SADI.
 
+.93
+   - removed XML::LibXML from the makefile
+   - updated some typos in SADI::DATA::*
+   - added some new documentation to the 
+     SADI impl classes that are generated.
+   - changed the license to new BSD and added
+     a LICENSE file.
+
 .92
    - updated the makefile
    - added some new documentation

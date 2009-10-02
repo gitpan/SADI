@@ -52,6 +52,7 @@ lib/SADI/SADI.pm
 lib/SADI/Service/Instance.pm
 lib/SADI/Service/ServiceBase.pm
 lib/SADI/Utils.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 META.yml

@@ -1,9 +1,9 @@
 #-----------------------------------------------------------------
 # SADI::Utils
 # Author: Edward Kawas <edward.kawas@gmail.com>
-# For copyright and disclaimer see below.
+# For copyright and disclaimer see LICENSE.
 #
-# $Id: Utils.pm,v 1.1 2009-08-25 14:30:50 ubuntu Exp $
+# $Id: Utils.pm,v 1.2 2009-10-02 15:53:46 ubuntu Exp $
 #-----------------------------------------------------------------
 
 package SADI::Utils;
@@ -14,7 +14,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.1 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 

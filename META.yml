@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.42
 distribution_type: module
 generated_by: 'Module::Install version 0.91'
-license: perl
+license: 'new BSD'
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
@@ -18,7 +18,7 @@ no_index:
   directory:
     - bin/scripts
     - inc
-    - lib/SADI/Generators/templates/
+    - lib/SADI/Generators/templates
     - share
     - t
 requires:
@@ -27,18 +27,19 @@ requires:
   Class::Inspector: 1.17
   Config::Simple: 4.58
   File::HomeDir: 0.65
+  File::Path: 0
   File::ShareDir: 1
   File::Spec: 0.8
   HTTP::Date: 5.81
+  HTTP::Request: 0
   IO::Prompt: 0.99.2
   IO::String: 1.08
+  LS: 1.1.7
+  LWP: 0
   Log::Log4perl: 1.12
   Params::Util: 0.38
   RDF::Core: 0.51
   Template: 1.11
   Unicode::String: 2.09
   Want: 0.18
-  XML::LibXML: 1.62
-resources:
-  license: http://dev.perl.org/licenses/
-version: 0.92
+version: 0.93

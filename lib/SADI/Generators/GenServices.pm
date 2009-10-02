@@ -5,7 +5,7 @@
 #
 # For copyright and disclaimer see below.
 #
-# $Id: GenServices.pm,v 1.6 2009-09-10 14:34:15 ubuntu Exp $
+# $Id: GenServices.pm,v 1.7 2009-10-02 15:54:08 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Generators::GenServices;
 
@@ -25,7 +25,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.6 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.7 $ =~ /: (\d+)\.(\d+)/;
 
 #-----------------------------------------------------------------
 # A list of allowed attribute names. See SADI::Base for details.
@@ -773,27 +773,27 @@ A directory containing service definitions.
 
 =head1 SUBROUTINES
 
-#-----------------------------------------------------------------
-# load
-#    load (cachedir      => dir,
-#          service_names => [..], ... )
-#-----------------------------------------------------------------
+=over
 
-#-----------------------------------------------------------------
-# generate_base
-#-----------------------------------------------------------------
+=item async_load
 
-#-----------------------------------------------------------------
-# generate_impl
-#-----------------------------------------------------------------
+=item load
 
-#-----------------------------------------------------------------
-# generate_cgi
-#-----------------------------------------------------------------
+=item generate_base
 
-#-----------------------------------------------------------------
-# generate_definition
-#-----------------------------------------------------------------
+=item generate_impl
+
+=item generate_cgi
+
+=item generate_definition
+
+=item generate_async_base
+
+=item generate_async_impl
+
+=item generate_async_cgi
+
+=back
 
 =cut
 

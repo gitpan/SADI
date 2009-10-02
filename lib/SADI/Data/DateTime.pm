@@ -4,7 +4,7 @@
 #         Martin Senger <martin.senger@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: DateTime.pm,v 1.2 2009-09-08 15:20:09 ubuntu Exp $
+# $Id: DateTime.pm,v 1.3 2009-10-02 15:54:01 ubuntu Exp $
 #-----------------------------------------------------------------
 
 package SADI::Data::DateTime;
@@ -13,11 +13,11 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.3 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
-SADI::Data::DateTime - A primite SADI data type for dates/times
+SADI::Data::DateTime - A primitive SADI data type for dates/times
 
 =head1 SYNOPSIS
 

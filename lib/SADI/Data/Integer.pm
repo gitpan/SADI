@@ -4,7 +4,7 @@
 #         Martin Senger <martin.senger@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: Integer.pm,v 1.1 2009-08-25 14:30:49 ubuntu Exp $
+# $Id: Integer.pm,v 1.2 2009-10-02 15:54:02 ubuntu Exp $
 #-----------------------------------------------------------------
 
 package SADI::Data::Integer;
@@ -13,11 +13,11 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.1 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
-SADI::Data::Integer - A primite SADI data type for integers
+SADI::Data::Integer - A primitive SADI data type for integers
 
 =head1 SYNOPSIS
 
