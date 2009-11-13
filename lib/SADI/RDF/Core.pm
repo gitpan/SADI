@@ -4,7 +4,7 @@
 #         Edward Kawas
 # For copyright and disclaimer see below.
 #
-# $Id: Core.pm,v 1.5 2009-09-17 16:30:59 ubuntu Exp $
+# $Id: Core.pm,v 1.12 2009-10-29 18:07:28 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::RDF::Core;
 use strict;
@@ -30,7 +30,7 @@ use base ("SADI::Base");
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.5 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.12 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -404,13 +404,22 @@ sub getObjects {
   will be extracted and added as a literal value rather than as an object.
 
   args
-     node => $URI  (the URI string or RDF::Core::Resource of the subject node)
+     
+     node => $URI  (the URI string or RDF::Core::Resource of the subject node) OR
+             a SADI::Data::OWL::Class (object generated using sadi-generate-datatypes).
+             In the event of an OWL class, all other args are ignored.
+     
      value => $val  (a string value)
+     
      predicate => $URI (optional - the predicate to put between them.  
                         Defaults to $self->ServicePredicate)
+     
      typed_as_output => boolean (if present output is rdf:typed as output class)
+     
      force_literal => boolean
+     
      label => $label (string); label for value node, only if value is a URI
+     
 
 =cut
 
@@ -420,7 +429,13 @@ sub addOutputData {
 	my $subject     = $args{node};
 	if ( ref($subject) =~ /RDF::Core::Resource/ ) {
 		$subject = RDF::Core::Resource->new( $subject->getURI );
-	} else {
+	} elsif ( UNIVERSAL::isa($subject, 'SADI::Data::OWL::Class') ) {
+		# using generated modules, so get their statements and return
+		foreach ( @{ $subject->_get_statements } ) {
+            $self->_addToModel( statement => $_ );
+        }
+        return;
+    } else {
 		$subject = RDF::Core::Resource->new($subject);
 	}
 	my $object         = $args{value};
@@ -564,7 +579,7 @@ sub getServiceInterface {
 	my $sigURL        = $self->Signature->SignatureURL() || "";
 
 	# generate from template
-	my $sadi_interface_signature;
+	my $sadi_interface_signature= '';
 	my $tt = Template->new( ABSOLUTE => 1, TRIM => 1 );
 	my $input = File::Spec->rel2abs(
 					  SADI::Utils->find_file(
@@ -589,11 +604,64 @@ sub getServiceInterface {
 					 authority     => $authority,
 					 sigURL        => $sigURL,
 				  },
-				  $sadi_interface_signature
+				  \$sadi_interface_signature
 	) || $LOG->logdie( $tt->error() );
 
 	return $sadi_interface_signature;
 }
+
+
+sub _add_error {
+    my ($self, $msg, $comment, $stack) = @_;
+
+    # generate from template
+    my $error_rdf = '';
+    my $tt = Template->new( ABSOLUTE => 1, TRIM => 1 );
+    my $input = File::Spec->rel2abs(
+                      SADI::Utils->find_file(
+                          $Bin, 'SADI', 'Generators', 'templates', 'service-error.tt'
+                      )
+    );
+    $msg ||= '';
+    $comment ||= '';
+    $stack ||= '';
+    
+    use CGI;
+    $tt->process(
+                  $input,
+                  {
+                     message  => CGI::escapeHTML($msg),
+                     comment  => CGI::escapeHTML($comment),
+                     stack    => CGI::escapeHTML($stack),
+                  },
+                  \$error_rdf
+    ) || $LOG->logdie( $tt->error() );
+    # if problem generating error doc, return
+    return unless defined ($error_rdf);
+    return if $error_rdf eq '';
+
+    # parse the error doc now
+	my $storage = new RDF::Core::Storage::Memory;
+	my $model = new RDF::Core::Model( Storage => $storage );
+	my %options = (
+	                Model      => $model,
+	                Source     => $error_rdf,
+	                SourceType => 'string',
+	);
+	my $parser = new RDF::Core::Model::Parser(%options);
+	$parser->parse;
+	my $enumerator = $model->getStmts;
+	my $statement  = $enumerator->getFirst;
+	# add statement to our output model
+	while ( defined $statement ) {
+	    $self->_addToModel(statement=>$statement);
+	    $statement = $enumerator->getNext;
+	}
+	$enumerator->close;
+	# done;
+	return;
+}
+
 
 sub _prepareOutputModel {
 	my ($self) = @_;

@@ -76,10 +76,10 @@ use SADI::RDF::Predicates::RDFS;
 #
 #    SADI::RDF::Core contains the following methods: 
 #         * Signature() - gets the SADI::Service::Instance 
-               object backing this SADI::RDF::Core reference
+#               object backing this SADI::RDF::Core reference
 #         * getInputNodes() - returns the RDF::Core::Resource 
-               nodes representing the input based on the 
-               input class for this service
+#               nodes representing the input based on the 
+#               input class for this service
 #         * getStatements -
 #            get an array of RDF::Core::Statements given a subject, object, and/or predicate from the input data
 #            

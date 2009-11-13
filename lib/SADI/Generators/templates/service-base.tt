@@ -68,7 +68,9 @@ sub [% obj.ServiceName %] {
     if ($@) {
 		$LOG->logdie ($@) if $in_testing_mode;
 		# construct an outgoing message
-		$LOG->error ($self->format_stack ($@));
+		my $stack = $self->format_stack ($@);
+        $core->_add_error($@, 'Error parsing input message for sadi service!', $stack);
+        $LOG->error ($stack);
 		$LOG->info ('*** FATAL ERROR RESPONSE BACK ***');
 		Log::Log4perl::NDC->pop();
 		return $core->serializeOutputModel();
@@ -83,7 +85,9 @@ sub [% obj.ServiceName %] {
     if ($@) {
 		$LOG->logdie ($@) if $in_testing_mode;
 		# TODO how to report errors?
-		$LOG->error ($self->format_stack ($@));
+		my $stack = $self->format_stack ($@);
+		$core->_add_error($@, 'Error running sadi service!', $stack);
+		$LOG->error ($stack);
 		$LOG->info ('*** REQUEST TERMINATED RESPONSE BACK ***');
 		Log::Log4perl::NDC->pop();
 		return $core->serializeOutputModel ();

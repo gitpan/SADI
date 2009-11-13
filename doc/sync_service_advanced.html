@@ -37,7 +37,7 @@
     <body>
         <h1>Building a Synchronous SADI Service With Perl (Advanced)</h1>
         <p>
-            This document summarises steps in order to develop (to implement) a synchronous 
+            This document summarises steps needed in order to develop (and to implement) a synchronous 
 			SADI web service using SADISeS (<strong>SADI</strong> <strong>S</strong>ervice 
 			<strong>S</strong>upoort). It should be noted that the service described in 
 			this document is more complicated than your average service.</p>
@@ -93,8 +93,8 @@
         <p>The service that we are going to implement in this document is one that given 2 or more (x,y) pairs, calculates the slope and intercept of the best fitting line through those pairs.</p>
     <p>To generate a definition file for your service, issue the following command at the command prompt:</p>
         <pre>$ sadi-generate-services.pl -D CalculateLinearRegression</pre>
-        <p>Basically, this tells SADISeS that we would like to generate a definition file for the service 'RenderBlastHits'. The generated file can be found in ~/Perl-SADI/definitions/CalculateLinearRegression.</p>
-        <p>If you open the generated definitions file, you will see something like the following:</p>
+        <p>Basically, this tells SADISeS that we would like to generate a definition file for the service 'CalculateLinearRegression'. The generated file can be found in ~/Perl-SADI/definitions/CalculateLinearRegression.</p>
+    <p>If you open the generated definitions file, you will see something like the following:</p>
         <pre># leave the following line as is!
 ServiceName = CalculateLinearRegression
 
@@ -120,8 +120,8 @@ ServiceName = CalculateLinearRegression
 
 # modify the values below as you see fit.
 ServiceType = http://someontology.org/services/sometype
-InputClass = http://sadiframework.org/examples/regression.owl\#PairedValueCollection
-OutputClass = http://sadiframework.org/examples/regression.owl\#OutputClass
+<strong>InputClass = http://sadiframework.org/examples/regression.owl\#PairedValueCollection
+OutputClass = http://sadiframework.org/examples/regression.owl\#OutputClass</strong>
 Description = A implementation of the 'CalculateLinearRegression' service
 UniqueIdentifier = urn:lsid:myservices:CalculateLinearRegression
 Authority = authority.for.CalculateLinearRegression

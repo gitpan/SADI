@@ -37,7 +37,7 @@
     <body>
         <h1>Building a Synchronous SADI Service With Perl</h1>
         <p>
-            This document summarises steps in order to develop (to implement) a synchronous 
+            This document summarises steps needed in order to develop (and to implement) a synchronous 
             SADI web service using SADISeS (<strong>SADI</strong>
             <strong>S</strong>ervice <strong>S</strong>upoort).
         </p>
@@ -123,7 +123,7 @@
         </p>
         <pre>$ sadi-generate-services.pl -D getGOTerm</pre>
         <p>
-            Basically, this tells SADISeS that we would like to generate a definition file for the service 'RenderBlastHits'. The generated file can be found in ~/Perl-SADI/definitions/getGOTerm.
+            Basically, this tells SADISeS that we would like to generate a definition file for the service 'getGOTerm'. The generated file can be found in ~/Perl-SADI/definitions/getGOTerm.
         </p>
         <p>
             If you open the generated definitions file, you will see something like the following:
@@ -166,8 +166,8 @@ ServiceName = getGOTerm
 
 # modify the values below as you see fit.
 ServiceType = http://someontology.org/services/sometype
-InputClass = http://purl.oclc.org/SADI/LSRN/GO_Record
-OutputClass = http://sadiframework.org/ontologies/service_objects.owl#getGOTerm_Output
+<strong>InputClass = http://purl.oclc.org/SADI/LSRN/GO_Record</strong>
+<strong>OutputClass = http://sadiframework.org/ontologies/service_objects.owl\#getGOTerm_Output</strong>
 Description = A implementation of the 'getGOTerm' service
 UniqueIdentifier = urn:lsid:myservices:getGOTerm
 Authority = authority.for.getGOTerm

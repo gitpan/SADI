@@ -8,7 +8,7 @@
     
 	# Define metadata
 	name 'SADI';
-	version '0.93';
+	version '0.95';
 	license 'new BSD';
 	abstract
 'This distribution aids in the creation of SADI perl based web services.';
@@ -21,7 +21,7 @@
 	requires 'File::Path'           => 0;
 	requires 'File::HomeDir'    	=> 0.65;
 	requires 'File::ShareDir'   	=> 1.00;
-	requires 'Config::Simple'      => 4.58;
+	requires 'Config::Simple'       => 4.58;
 	requires 'Log::Log4perl'    	=> 1.12;
 	requires 'HTTP::Date'			=> 5.81;	
 	requires 'Template'         	=> 1.11;
@@ -33,11 +33,8 @@
     requires 'LS'                   => '1.1.7';
     requires 'HTTP::Request'        => 0;
     requires 'LWP'                  => 0;
-    
-
-    # hmm, thought i needed this, but i dont!
-	#requires 'XML::LibXML::Common'  => 0.13;
-	#requires 'XML::LibXML'      	=> 1.62;
+    requires 'PLUTO'                => '0.21';
+    requires 'URI'                  => '1.40';  
 
     # windows doesn't need this
 	if ( not MSWIN ) {
@@ -60,11 +57,13 @@
     
 
 	no_index directory        => 'bin/scripts';
+
     # dont index template files
     no_index directory => 'lib/SADI/Generators/templates';
     
 	install_script 'bin/scripts/sadi-install.pl';
 	install_script 'bin/scripts/sadi-generate-services.pl';
+	install_script 'bin/scripts/sadi-generate-datatypes.pl';
 	install_script 'bin/scripts/sadi-testing-service.pl';
 	install_script 'bin/scripts/sadi-config-status.pl';
 	install_share 'share';

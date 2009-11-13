@@ -2,7 +2,7 @@
 #
 # Calling a BioMoby services (with or without SOAP).
 #
-# $Id: sadi-testing-service.pl,v 1.8 2009-09-10 19:22:53 ubuntu Exp $
+# $Id: sadi-testing-service.pl,v 1.9 2009-11-13 18:37:43 ubuntu Exp $
 # Contact: Martin Senger <martin.senger@gmail.com>
 # -----------------------------------------------------------
 
@@ -82,7 +82,7 @@ END_OF_USAGE
 }
 
 use strict;
-
+use Carp;
 sub _empty_input {
 	eval "use SADI::Utils; 1;" or die "$@\n";
 	return SADI::Utils::empty_rdf();

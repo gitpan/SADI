@@ -76,10 +76,10 @@ use SADI::RDF::Predicates::RDFS;
 #
 #    SADI::RDF::Core contains the following methods: 
 #         * Signature() - gets the SADI::Service::Instance 
-               object backing this SADI::RDF::Core reference
+#               object backing this SADI::RDF::Core reference
 #         * getInputNodes() - returns the RDF::Core::Resource 
-               nodes representing the input based on the 
-               input class for this service
+#               nodes representing the input based on the 
+#               input class for this service
 #         * getStatements -
 #            get an array of RDF::Core::Statements given a subject, object, and/or predicate from the input data
 #            
@@ -118,7 +118,13 @@ use SADI::RDF::Predicates::RDFS;
 #                  will be extracted and added as a literal value rather than as an object.
 #                
 #                  args
-#                     node => $URI  (the URI string or RDF::Core::Resource of the subject node)
+#                     node => $URI  (the URI string or RDF::Core::Resource of the subject node
+#                             or a subclass of SADI::Data::OWL::Class )
+#                       NOTE:
+#                          if $URI->isa(SADI::Data::OWL::Class) created via
+#                          sadi-generate-datatypes script then all RDF statements
+#                          for this resource are added to our model and all 
+#                          other arguments are ignored!
 #                     value => $val  (a string value)
 #                     predicate => $URI (optional - the predicate to put between them.  
 #                                        Defaults to $self->ServicePredicate)

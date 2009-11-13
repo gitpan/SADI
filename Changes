@@ -1,5 +1,22 @@
 Revision history for Perl extension SADI.
 
+0.94
+    - in the tutorials, fixed a couple 
+      more typos; bolded some sections.
+    - added RDF to describe internal errors
+      when running sadi services.
+    - introduced sadi-generate-datatypes script
+      this script takes RDF/OWL and produces
+      modules that you can use in SADISeS.
+    - Added to SADI::RDF::Core, the ability to
+      add output data of type 
+      SADI::Data::OWL::Class.
+       
+    - TODO 
+        * when reporting errors, update
+          the HTTP response code 
+    -
+    - 
 .93
    - removed XML::LibXML from the makefile
    - updated some typos in SADI::DATA::*

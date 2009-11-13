@@ -4,12 +4,13 @@
 #         Martin Senger <martin.senger@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: Base.pm,v 1.4 2009-08-25 22:02:17 ubuntu Exp $
+# $Id: Base.pm,v 1.19 2009-11-13 18:02:40 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Base;
 use strict;
-
 use HTTP::Date;
+use URI;
+use LS::ID;
 
 use vars qw( $VERSION $Revision $AUTOLOAD @EXPORT @ISA );
 use vars qw( $LOG $LOGGER_NAME $CONFIG_NAMESPACE );
@@ -26,179 +27,259 @@ use constant TYPE     => 'type';
 use constant POST     => 'post';
 use constant ISARRAY  => 'is_array';
 use constant READONLY => 'readonly';
+use overload q("")    => "as_string";
 
-use overload q("") => "as_string";
+BEGIN {
+	@ISA      = qw( Exporter );
+	@EXPORT   = qw( $LOG );
+	$VERSION  = sprintf "%d.%02d", q$Revision: 1.19 $ =~ /: (\d+)\.(\d+)/;
+	$Revision = '$Id: Base.pm,v 1.19 2009-11-13 18:02:40 ubuntu Exp $';
 
-BEGIN {	
-    @ISA = qw( Exporter );
-    @EXPORT = qw( $LOG );
+	# initiate error handling
+	require Carp;
+	import Carp qw( confess );
 
-    $VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /: (\d+)\.(\d+)/;
-    $Revision  = '$Id: Base.pm,v 1.4 2009-08-25 22:02:17 ubuntu Exp $';
+	# read default configuration file and import configuration
+	# parameters into 'SADICFG namespace'
+	use SADI::Config;
+	$CONFIG_NAMESPACE = 'SADICFG';
 
-    # initiate error handling
-    require Carp; import Carp qw( confess );
-
-    # read default configuration file and import configuration
-    # parameters into 'SADICFG namespace'
-    use SADI::Config;
-    $CONFIG_NAMESPACE = 'SADICFG';
-    sub init_config {
-	  shift;   # invocant ignored
-	  SADI::Config->init (@_);
-	  SADI::Config->import_names ($CONFIG_NAMESPACE);
-    }
-    SADI::Base->init_config;
-
-    # initiate logging
-    use Log::Log4perl qw(get_logger :levels :no_extra_logdie_message);
-    $LOGGER_NAME = 'services';
-    sub init_logging {
-	if ($SADICFG::LOG_CONFIG) {
-	    eval { Log::Log4perl->init ($SADICFG::LOG_CONFIG) };
-	    $LOG = get_logger ($LOGGER_NAME) and return unless $@;
-	    print STDERR "Problem with configuration file '$SADICFG::LOG_CONFIG': $@\n";
+	sub init_config {
+		shift;    # invocant ignored
+		SADI::Config->init(@_);
+		SADI::Config->import_names($CONFIG_NAMESPACE);
 	}
-	# configuration for logging not found; make some easy logging
-	my $logfile = $SADICFG::LOG_FILE;
-	my $loglevel = $SADICFG::LOG_LEVEL || $INFO;
-	my $pattern = $SADICFG::LOG_PATTERN || '%d (%r) %p> [%x] %F{1}:%L - %m%n';
-	$LOG = get_logger ($LOGGER_NAME);
-	$LOG->level (uc $loglevel);
-	my $appender =
-	    ($logfile and $logfile !~ /^stderr$/i) ?
-	     Log::Log4perl::Appender->new ("Log::Log4perl::Appender::File",
-					   name     => 'Log',
-					   filename => $logfile,
-					   mode     => 'append') :
-	     Log::Log4perl::Appender->new ("Log::Log4perl::Appender::Screen",
-					   name     => 'Screen');
-	$LOG->add_appender ($appender);
-	my $layout = Log::Log4perl::Layout::PatternLayout->new ($pattern);
-	$appender->layout ($layout);
-    }
-    SADI::Base->init_logging;
-}
+	SADI::Base->init_config;
 
+	# initiate logging
+	use Log::Log4perl qw(get_logger :levels :no_extra_logdie_message);
+	$LOGGER_NAME = 'services';
+
+	sub init_logging {
+		if ($SADICFG::LOG_CONFIG) {
+			eval { Log::Log4perl->init($SADICFG::LOG_CONFIG) };
+			$LOG = get_logger($LOGGER_NAME) and return unless $@;
+			print STDERR
+			  "Problem with configuration file '$SADICFG::LOG_CONFIG': $@\n";
+		}
+
+		# configuration for logging not found; make some easy logging
+		my $logfile  = $SADICFG::LOG_FILE;
+		my $loglevel = $SADICFG::LOG_LEVEL || $INFO;
+		my $pattern  = $SADICFG::LOG_PATTERN
+		  || '%d (%r) %p> [%x] %F{1}:%L - %m%n';
+		$LOG = get_logger($LOGGER_NAME);
+		$LOG->level( uc $loglevel );
+		my $appender =
+		  ( $logfile and $logfile !~ /^stderr$/i )
+		  ? Log::Log4perl::Appender->new(
+										  "Log::Log4perl::Appender::File",
+										  name     => 'Log',
+										  filename => $logfile,
+										  mode     => 'append'
+		  )
+		  : Log::Log4perl::Appender->new( "Log::Log4perl::Appender::Screen",
+										  name => 'Screen' );
+		$LOG->add_appender($appender);
+		my $layout = Log::Log4perl::Layout::PatternLayout->new($pattern);
+		$appender->layout($layout);
+	}
+	SADI::Base->init_logging;
+}
 
 #-----------------------------------------------------------------
 # These methods are called by set/get methods of the sub-classes. If
 # it comes here, it indicates that an attribute being get/set does not
 # exist.
 #-----------------------------------------------------------------
-
 {
-    my %_allowed =
-	(
-	 );
+	my %_allowed = ();
 
-    sub _accessible {
-	my ($self, $attr) = @_;
-	exists $_allowed{$attr};
-    }
-    sub _attr_prop {
-	my ($self, $attr_name, $prop_name) = @_;
-	my $attr = $_allowed {$attr_name};
-	return ref ($attr) ? $attr->{$prop_name} : $attr if $attr;
-	return undef;
-    }
+	sub _accessible {
+		my ( $self, $attr ) = @_;
+		exists $_allowed{$attr};
+	}
+
+	sub _attr_prop {
+		my ( $self, $attr_name, $prop_name ) = @_;
+		my $attr = $_allowed{$attr_name};
+		return ref($attr) ? $attr->{$prop_name} : $attr if $attr;
+		return undef;
+	}
 }
 
 #-----------------------------------------------------------------
 # new
 #-----------------------------------------------------------------
 sub new {
-    my ($class, @args) = @_;
-#    $LOG->debug ("NEW: $class - " . join (", ", @args)) if $LOG->is_debug;
+	my ( $class, @args ) = @_;
 
-    # create an object
-    my $self = bless {}, ref ($class) || $class;
+	#    $LOG->debug ("NEW: $class - " . join (", ", @args)) if $LOG->is_debug;
+	# create an object
+	my $self = bless {}, ref($class) || $class;
 
-    # initialize the object
-    $self->init();
+	# initialize the object
+	$self->init();
 
-    # set all @args into this object with 'set' values
-    my (%args) = (@args == 1 ? (value => $args[0]) : @args);
-    foreach my $key (keys %args) {
-        no strict 'refs'; 
-        $self->$key ($args {$key});
-    }
+	# set all @args into this object with 'set' values
+	my (%args) = ( @args == 1 ? ( value => $args[0] ) : @args );
+	foreach my $key ( keys %args ) {
+		no strict 'refs';
+		$self->$key( $args{$key} );
+	}
 
-    # done
-    return $self;
+	# done
+	return $self;
 }
 
 #-----------------------------------------------------------------
 # init
 #-----------------------------------------------------------------
 sub init {
-    my ($self) = shift;
+	my ($self) = shift;
 }
 
 #-----------------------------------------------------------------
 # toString
 #-----------------------------------------------------------------
 sub toString {
-    my ($self, $something_else) = @_;
-    require Data::Dumper;
-    if ($something_else) {
-	return Data::Dumper->Dump ( [$something_else], ['M']);
-    } else {
-	return Data::Dumper->Dump ( [$self], ['M']);
-    }
+	my ( $self, $something_else ) = @_;
+	require Data::Dumper;
+	if ($something_else) {
+		return Data::Dumper->Dump( [$something_else], ['M'] );
+	} else {
+		return Data::Dumper->Dump( [$self], ['M'] );
+	}
 }
 
 #-----------------------------------------------------------------
 # module_name_escape
 #-----------------------------------------------------------------
 sub module_name_escape {
-    my ($self, $name) = @_;
-    $name =~ tr/-/_/;
-    return $name;
+	my ( $self, $name ) = @_;
+	$name =~ tr/-/_/;
+	return $name;
 }
 
 #-----------------------------------------------------------------
 # datatype2module
 #-----------------------------------------------------------------
 sub datatype2module {
-    my ($self, $datatype_name) = @_;
-    return undef unless $datatype_name;
-    return 'SADI::Data::' . $self->module_name_escape ($datatype_name);
+	my ( $self, $datatype_name ) = @_;
+	return undef unless $datatype_name;
+
+	#return 'SADI::Data::' . $self->module_name_escape ($datatype_name);
+	return $self->module_name_escape($datatype_name);
+}
+
+#-----------------------------------------------------------------
+# oProperty2module
+#-----------------------------------------------------------------
+sub oProperty2module {
+	my ( $self, $datatype_name ) = @_;
+	return undef unless $datatype_name;
+
+  #return 'SADI::Data::Property::' . $self->module_name_escape ($datatype_name);
+	return $self->module_name_escape($datatype_name);
+}
+
+#-----------------------------------------------------------------
+# uri2package
+#-----------------------------------------------------------------
+sub uri2package {
+	my ( $self, $uri ) = @_;
+	return undef unless $uri;
+
+	# is $uri an LSID?
+	if ( lc($uri) =~ m/^urn\:lsid/gi ) {
+		my $lsid = LS::ID->new( $uri );
+
+		# cheat a little ;-)
+		$uri =
+		    'http://'
+		  . $lsid->authority . '/'
+		  . $lsid->namespace . '#'
+		  . $lsid->object;
+	}
+	my $u1 = URI->new($uri);
+
+	# the domain from the uri
+	my $authority = $u1->authority || '';
+
+	# convert . to ::
+	$authority =~ s/\./::/g;
+
+	# the thing after the # if it exists
+	my $frag = $u1->fragment || '';
+
+	# convert . to _
+	$frag =~ s/\./_/g if $frag;
+
+	# the path
+	my $path = $u1->path || '';
+
+	# remove leading /
+	$path =~ s/^\///g;
+
+	# convert / and . to ::
+	$path =~ s/\/|\./::/g;
+	my $package = '';
+
+	# package name assuming that uri#foo
+	$package = "$authority\:\:$path\:\:$frag" if $frag and $frag ne '';
+
+	# package name assuming uri/foo
+	$package = "$authority\:\:$path" if $package eq '';
+
+	# make sure that nothing funny happened ...
+	$package =~ s/^\:*//g;
+	$package =~ s/\:*$//g;
+	if ( $package =~ m/^genid/gi ) {
+        $package = "Blank::$package";
+	}
+	return $package;
+}
+
+#-----------------------------------------------------------------
+# owlClass2module
+#-----------------------------------------------------------------
+sub owlClass2module {
+	my ( $self, $datatype_name ) = @_;
+	return undef unless $datatype_name;
+	return $self->module_name_escape($datatype_name);
+
+	#return 'SADI::Data::OWL::' . $self->module_name_escape ($datatype_name);
 }
 
 #-----------------------------------------------------------------
 # service2module
 #-----------------------------------------------------------------
 sub service2module {
-    my ($self, $authority, $service_name) = @_;
+	my ( $self, $authority, $service_name ) = @_;
 
-    # default values that will be, at the end, however, rarely used
-    $authority    = 'ca.wilkinsonlab.sadi.service' unless $authority;
-    $service_name = 'TheService' unless $service_name;
-
-    return
-	join ('::', reverse split (/\./, $self->module_name_escape ($authority))) .
-	'::' .
-	$service_name .
-	'Base';
+	# default values that will be, at the end, however, rarely used
+	$authority = 'ca.wilkinsonlab.sadi.service' unless $authority;
+	$service_name = 'TheService' unless $service_name;
+	return
+	  join( '::', reverse split( /\./, $self->module_name_escape($authority) ) )
+	  . '::'
+	  . $service_name . 'Base';
 }
 
 #-----------------------------------------------------------------
 # escape_name
 #-----------------------------------------------------------------
 sub escape_name {
-    my ($self, $name) = @_;
-    $name =~ s/\W/_/g;
-    return ($name =~ /^\d/ ? "_$name" : $name);
+	my ( $self, $name ) = @_;
+	$name =~ s/\W/_/g;
+	return ( $name =~ /^\d/ ? "_$name" : $name );
 }
-
 
 #-----------------------------------------------------------------
 #
 #  Error handling
 #
 #-----------------------------------------------------------------
-
 my $DEFAULT_THROW_WITH_LOG   = 0;
 my $DEFAULT_THROW_WITH_STACK = 1;
 
@@ -206,31 +287,35 @@ my $DEFAULT_THROW_WITH_STACK = 1;
 # throw
 #-----------------------------------------------------------------
 sub throw {
-   my ($self, $msg) = @_;
-   $msg .= "\n" unless $msg =~ /\n$/;
+	my ( $self, $msg ) = @_;
+	$msg .= "\n" unless $msg =~ /\n$/;
 
-   # make an instance, if called as a class method
-   unless (ref $self) {
-       no strict 'refs'; 
-       $self = $self->new;
-   }
+	# make an instance, if called as a class method
+	unless ( ref $self ) {
+		no strict 'refs';
+		$self = $self->new;
+	}
 
-   # add (optionally) stack trace
-   $msg ||= 'An error.';
-   my $with_stack = (defined $self->enable_throw_with_stack ?
-		     $self->enable_throw_with_stack :
-		     $DEFAULT_THROW_WITH_STACK);
-   my $result = ($with_stack ? $self->format_stack ($msg) : $msg);
+	# add (optionally) stack trace
+	$msg ||= 'An error.';
+	my $with_stack = (
+					   defined $self->enable_throw_with_stack
+					   ? $self->enable_throw_with_stack
+					   : $DEFAULT_THROW_WITH_STACK
+	);
+	my $result = ( $with_stack ? $self->format_stack($msg) : $msg );
 
-   # die or log and die?
-   my $with_log = (defined $self->enable_throw_with_log ?
-		   $self->enable_throw_with_log :
-		   $DEFAULT_THROW_WITH_LOG);
-   if ($with_log) {
-       $LOG->logdie ($result);
-   } else {
-       die ($result);
-   }
+	# die or log and die?
+	my $with_log = (
+					 defined $self->enable_throw_with_log
+					 ? $self->enable_throw_with_log
+					 : $DEFAULT_THROW_WITH_LOG
+	);
+	if ($with_log) {
+		$LOG->logdie($result);
+	} else {
+		die($result);
+	}
 }
 
 #-----------------------------------------------------------------
@@ -247,46 +332,44 @@ sub throw {
 #
 #-----------------------------------------------------------------
 sub enable_throw_with_log {
-    my ($self, $value) = @_;
-    $self->{enable_throw_with_log} = ($value ? 1 : 0)
-	if (defined $value);
-    return $self->{enable_throw_with_log};
+	my ( $self, $value ) = @_;
+	$self->{enable_throw_with_log} = ( $value ? 1 : 0 )
+	  if ( defined $value );
+	return $self->{enable_throw_with_log};
 }
 
 sub default_throw_with_log {
-    my ($self, $value) = @_;
-    $DEFAULT_THROW_WITH_LOG = ($value ? 1 : 0)
-	if defined $value;
-    return $DEFAULT_THROW_WITH_LOG;
+	my ( $self, $value ) = @_;
+	$DEFAULT_THROW_WITH_LOG = ( $value ? 1 : 0 )
+	  if defined $value;
+	return $DEFAULT_THROW_WITH_LOG;
 }
 
 sub enable_throw_with_stack {
-    my ($self, $value) = @_;
-    $self->{enable_throw_with_stack} = ($value ? 1 : 0)
-	if defined $value;
-    return $self->{enable_throw_with_stack};
+	my ( $self, $value ) = @_;
+	$self->{enable_throw_with_stack} = ( $value ? 1 : 0 )
+	  if defined $value;
+	return $self->{enable_throw_with_stack};
 }
 
 sub default_throw_with_stack {
-    my ($self, $value) = @_;
-    $DEFAULT_THROW_WITH_STACK = ($value ? 1 : 0)
-	if defined $value;
-    return $DEFAULT_THROW_WITH_STACK;
+	my ( $self, $value ) = @_;
+	$DEFAULT_THROW_WITH_STACK = ( $value ? 1 : 0 )
+	  if defined $value;
+	return $DEFAULT_THROW_WITH_STACK;
 }
 
 #-----------------------------------------------------------------
 # format_stack
 #-----------------------------------------------------------------
 sub format_stack {
-    my ($self, $msg) = @_;
-    my $stack = $self->_reformat_stacktrace ($msg);
-    my $class = ref ($self) || $self;
-
-    my $title = "------------- EXCEPTION: $class -------------";
-    my $footer = "\n" . '-' x CORE::length ($title);
-    return "\n$title\nMSG: $msg\n" . $stack . $footer . "\n";
+	my ( $self, $msg ) = @_;
+	my $stack  = $self->_reformat_stacktrace($msg);
+	my $class  = ref($self) || $self;
+	my $title  = "------------- EXCEPTION: $class -------------";
+	my $footer = "\n" . '-' x CORE::length($title);
+	return "\n$title\nMSG: $msg\n" . $stack . $footer . "\n";
 }
-
 
 #-----------------------------------------------------------------
 # _reformat_stacktrace
@@ -303,40 +386,41 @@ sub format_stack {
 #  any file:line data.
 #-----------------------------------------------------------------
 sub _reformat_stacktrace {
-    my ($self, $msg) = @_;
-    my $stack = Carp->longmess;
-    $stack =~ s/\Q$msg//;
-    my @stack = split( /\n/, $stack);
-    my @new_stack = ();
-    my ($method, $file, $linenum, $prev_file, $prev_linenum);
-    my $stack_count = 0;
-    foreach my $i ( 0..$#stack ) {
-        if ( ($stack[$i] =~ /^\s*([^(]+)\s*\(.*\) called at (\S+) line (\d+)/) ||
-	      ($stack[$i] =~ /^\s*(require 0) called at (\S+) line (\d+)/) ) {
-            ($method, $file, $linenum) = ($1, $2, $3);
-            $stack_count++;
-        } else {
-            next;
-        }
-        if( $stack_count == 1 ) {
-            push @new_stack, "STACK: $method";
-            ($prev_file, $prev_linenum) = ($file, $linenum);
-            next;
-        }
+	my ( $self, $msg ) = @_;
+	my $stack = Carp->longmess;
+	$stack =~ s/\Q$msg//;
+	my @stack = split( /\n/, $stack );
+	my @new_stack = ();
+	my ( $method, $file, $linenum, $prev_file, $prev_linenum );
+	my $stack_count = 0;
+	foreach my $i ( 0 .. $#stack ) {
 
-        if( $method =~ /__ANON__/ ) {
-            $method = "try{} block";
-        }
-        if( ($method =~ /^require/ and $file =~ /Error\.pm/ ) ||
-            ($method =~ /^Error::subs::try/ ) )   {
-            last;
-        }
-        push @new_stack, "STACK: $method $prev_file:$prev_linenum";
-        ($prev_file, $prev_linenum) = ($file, $linenum);
-    }
-    push @new_stack, "STACK: $prev_file:$prev_linenum";
-
-    return join "\n", @new_stack;
+		if ( ( $stack[$i] =~ /^\s*([^(]+)\s*\(.*\) called at (\S+) line (\d+)/ )
+			 || ( $stack[$i] =~ /^\s*(require 0) called at (\S+) line (\d+)/ ) )
+		{
+			( $method, $file, $linenum ) = ( $1, $2, $3 );
+			$stack_count++;
+		} else {
+			next;
+		}
+		if ( $stack_count == 1 ) {
+			push @new_stack, "STACK: $method";
+			( $prev_file, $prev_linenum ) = ( $file, $linenum );
+			next;
+		}
+		if ( $method =~ /__ANON__/ ) {
+			$method = "try{} block";
+		}
+		if (    ( $method =~ /^require/ and $file =~ /Error\.pm/ )
+			 || ( $method =~ /^Error::subs::try/ ) )
+		{
+			last;
+		}
+		push @new_stack, "STACK: $method $prev_file:$prev_linenum";
+		( $prev_file, $prev_linenum ) = ( $file, $linenum );
+	}
+	push @new_stack, "STACK: $prev_file:$prev_linenum";
+	return join "\n", @new_stack;
 }
 
 #-----------------------------------------------------------------
@@ -344,86 +428,99 @@ sub _reformat_stacktrace {
 # Here we return message explaining that it isn't.
 #-----------------------------------------------------------------
 sub _wrong_type_msg {
-    my ($self, $given_type_or_value, $expected_type, $method) = @_;
-    my $msg = 'In method ';
-    if (defined $method) {
-	$msg .= $method;
-    } else {
-	$msg .= (caller(1))[3];
-    }
-    return ("$msg: Trying to set '$given_type_or_value' but '$expected_type' is expected.");
+	my ( $self, $given_type_or_value, $expected_type, $method ) = @_;
+	my $msg = 'In method ';
+	if ( defined $method ) {
+		$msg .= $method;
+	} else {
+		$msg .= ( caller(1) )[3];
+	}
+	return (
+"$msg: Trying to set '$given_type_or_value' but '$expected_type' is expected."
+	);
 }
 
 #-----------------------------------------------------------------
 # Deal with 'set', 'get' and 'add_' methods.
 #-----------------------------------------------------------------
 sub AUTOLOAD {
-    my ($self, @new_values) = @_;
-    my $ref_sub;
-    if ($AUTOLOAD =~ /.*::(\w+)/ && $self->_accessible ("$1")) {
+	my ( $self, @new_values ) = @_;
+	my $ref_sub;
+	if ( $AUTOLOAD =~ /.*::(\w+)/ && $self->_accessible("$1") ) {
 
-	# get/set method
-	my $attr_name = "$1";
-	my $attr_type = $self->_attr_prop ($attr_name, TYPE) || STRING;
-	my $attr_post = $self->_attr_prop ($attr_name, POST);
-	my $attr_is_array = $self->_attr_prop ($attr_name, ISARRAY);
-	my $attr_readonly = $self->_attr_prop ($attr_name, READONLY);
-	$ref_sub =
-	    sub {
-		local *__ANON__ = "__ANON__$attr_name" . "_" . ref ($self);
-		my ($this, @values) = @_;
-		return $this->_getter ($attr_name) unless @values;
-		$self->throw ("Sorry, the attribute '$attr_name' is read-only.")
-		    if $attr_readonly;
+		# get/set method
+		my $attr_name     = "$1";
+		my $attr_type     = $self->_attr_prop( $attr_name, TYPE ) || STRING;
+		my $attr_post     = $self->_attr_prop( $attr_name, POST );
+		my $attr_is_array = $self->_attr_prop( $attr_name, ISARRAY );
+		my $attr_readonly = $self->_attr_prop( $attr_name, READONLY );
+		$ref_sub = sub {
+			local *__ANON__ = "__ANON__$attr_name" . "_" . ref($self);
+			my ( $this, @values ) = @_;
+			return $this->_getter($attr_name) unless @values;
+			$self->throw("Sorry, the attribute '$attr_name' is read-only.")
+			  if $attr_readonly;
 
-		# here we continue with 'set' method:
-		if ($attr_is_array) {
-		    my @result = (ref ($values[0]) eq 'ARRAY' ? @{$values[0]} : @values);
-		    foreach my $value (@result) {
-			$value = $this->check_type ($AUTOLOAD, $attr_type, $value);
-		    }
-		    $this->_setter ($attr_name, $attr_type, \@result);
-		} else {
-		    $this->_setter ($attr_name, $attr_type, $this->check_type ($AUTOLOAD, $attr_type, @values));
-		}
-
-		# call post-procesing (if defined)
-		$this->$attr_post ($this->{$attr_name}) if $attr_post;
-
-		return $this->{$attr_name};
-	    };
-
-    } elsif ($AUTOLOAD =~ /.*::add_(\w+)/ && $self->_accessible ("$1")) {
-
-	# add_XXXX method
-	my $attr_name = "$1";
-	if ($self->_attr_prop ($attr_name, ISARRAY)) {
-	    my $attr_type = $self->_attr_prop ($attr_name, TYPE) || STRING;
-	    $ref_sub =
-		sub {
-		    local *__ANON__ = "__ANON__$attr_name" . "_" . ref ($self);
-		    my ($this, @values) = @_;
-		    if (@values) {
-			my @result = (ref ($values[0]) eq 'ARRAY' ? @{$values[0]} : @values);
-			foreach my $value (@result) {
-			    $value = $this->check_type ($AUTOLOAD, $attr_type, $value);
+			# here we continue with 'set' method:
+			if ($attr_is_array) {
+				my @result =
+				  ( ref( $values[0] ) eq 'ARRAY' ? @{ $values[0] } : @values );
+				foreach my $value (@result) {
+					$value = $this->check_type( $AUTOLOAD, $attr_type, $value );
+				}
+				$this->_setter( $attr_name, $attr_type, \@result );
+			} else {
+				$this->_setter(
+								$attr_name,
+								$attr_type,
+								$this->check_type(
+												  $AUTOLOAD, $attr_type, @values
+								)
+				);
 			}
-			$this->_adder ($attr_name, $attr_type, @result);
-		    }
-		    return $this;
+
+			# call post-procesing (if defined)
+			$this->$attr_post( $this->{$attr_name} ) if $attr_post;
+			return $this->{$attr_name};
+		};
+	} elsif ( $AUTOLOAD =~ /.*::add_(\w+)/ && $self->_accessible("$1") ) {
+
+		# add_XXXX method
+		my $attr_name = "$1";
+		my $attr_post = $self->_attr_prop( $attr_name, POST );
+		if ( $self->_attr_prop( $attr_name, ISARRAY ) ) {
+			my $attr_type = $self->_attr_prop( $attr_name, TYPE ) || STRING;
+			$ref_sub = sub {
+				local *__ANON__ = "__ANON__$attr_name" . "_" . ref($self);
+				my ( $this, @values ) = @_;
+				if (@values) {
+					my @result = (
+								   ref( $values[0] ) eq 'ARRAY'
+								   ? @{ $values[0] }
+								   : @values );
+					foreach my $value (@result) {
+						$value =
+						  $this->check_type( $AUTOLOAD, $attr_type, $value );
+					}
+					$this->_adder( $attr_name, $attr_type, @result );
+				}
+
+				# call post-procesing (if defined)
+				$this->$attr_post( $this->{$attr_name} ) if $attr_post;
+				return $this;
+			  }
+		} else {
+			$self->throw(
+				 "Method '$AUTOLOAD' is allowed only for array-type attributes."
+			);
 		}
 	} else {
-	    $self->throw ("Method '$AUTOLOAD' is allowed only for array-type attributes.");
+		$self->throw("No such method: $AUTOLOAD");
 	}
-
-    } else {
-	$self->throw ("No such method: $AUTOLOAD");
-    }
-
-    no strict 'refs'; 
-    *{$AUTOLOAD} = $ref_sub;
-    use strict 'refs'; 
-    return $ref_sub->($self, @new_values);
+	no strict 'refs';
+	*{$AUTOLOAD} = $ref_sub;
+	use strict 'refs';
+	return $ref_sub->( $self, @new_values );
 }
 
 #-----------------------------------------------------------------
@@ -431,21 +528,21 @@ sub AUTOLOAD {
 # they are separated here so they can be overriten - as they are in
 # the service skeletons, for example. Also, there may be situation
 # that one can call them if other features (such as type checking) are
-# not requiered.
+# not required.
 #-----------------------------------------------------------------
 sub _getter {
-    my ($self, $attr_name) = @_;
-    return $self->{$attr_name};
+	my ( $self, $attr_name ) = @_;
+	return $self->{$attr_name};
 }
 
 sub _setter {
-    my ($self, $attr_name, $attr_type, $value) = @_;
-    $self->{$attr_name} = $value;
+	my ( $self, $attr_name, $attr_type, $value ) = @_;
+	$self->{$attr_name} = $value;
 }
 
 sub _adder {
-    my ($self, $attr_name, $attr_type, @values) = @_;
-    push ( @{ $self->{$attr_name} }, @values );
+	my ( $self, $attr_name, $attr_type, @values ) = @_;
+	push( @{ $self->{$attr_name} }, @values );
 }
 
 #-----------------------------------------------------------------
@@ -462,111 +559,112 @@ sub DESTROY {
 #
 #-----------------------------------------------------------------
 sub check_type {
-    my ($self, $name, $expected_type, @values) = @_;
-    my $value = $values[0];
+	my ( $self, $name, $expected_type, @values ) = @_;
+	my $value = $values[0];
 
-    # first process cases when an expected type is a simple string,
-    # integer etc. (not SADI::Data::String etc.) - e.g. when an ID
-    # attribute is being set
-
-    if ($expected_type eq STRING) {
-	return $value;
-
-    } elsif ($expected_type eq INTEGER) {
-	$self->throw ($self->_wrong_type_msg ($value, $expected_type, $name))
-	    unless $value =~ m/^\s*[+-]?\s*\d+\s*$/;
-	$value =~ s/\s//g;
-	return $value;
-
-    } elsif ($expected_type eq FLOAT) {
-	$self->throw ($self->_wrong_type_msg ($value, $expected_type, $name))
-	    unless $value =~ m/^\s*[+-]?\s*(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?\s*$/;
-	$value =~ s/\s//g;
-	return $value;
-
-    } elsif ($expected_type eq BOOLEAN) {
-	return ($value =~ /true|\+|1|yes|ano/ ? '1' : '0');
-
-    } elsif ($expected_type eq DATETIME) {
-	my $iso;
-	eval { 
-	    $iso = (HTTP::Date::time2isoz (HTTP::Date::str2time (HTTP::Date::parse_date ($value))));
-	};
-	$self->throw ($self->_wrong_type_msg ($value, 'ISO-8601', $name))
-	    if $@;
-	return $iso;   ### $iso =~ s/ /T/;  ??? TBD
-
-    } else {
-
-	# Then process cases when the expected type is a name of a
-	# real object (e.g. SADI::Data::String); for these cases the
-	# $value[0] can be already such object - in which case nothing
-	# to be done; or $value[0] can be HASH, or @values can be a
-	# list of name/value pairs, in which case a new object (of
-	# type $expected_type) has to be created and initialized by
-	# @values; and, still in the latter case, if the @values has
-	# just one element (XX), this element is considered a 'value':
-	# it is treated as a a hash {value => XX}.
-
-	return $value if UNIVERSAL::isa ($value, $expected_type);
-
-	$value = { value => $value }
-	    unless ref ($value) || @values > 1;
-
-	my ($value_ref_type) = ref ($value);
-	if ($value_ref_type eq 'HASH') {
-	    # e.g. $sequence->Length ( { value => 12, id => 'IR64'} )
-	    return $self->create_member ($name, $expected_type, %$value);
-
-	} elsif ($value_ref_type eq 'ARRAY') {
-	    # e.g. $sequence->Length ( [ value => 12, id => 'IR64'] )
-	    return $self->create_member ($name, $expected_type, @$value);
-
-	} elsif ($value_ref_type) {
-	    # e.g. $sequence->Length ( new SADI::Data::Integer ( value => 12) )
-	    $self->throw ($self->_wrong_type_msg ($value_ref_type, $expected_type, $name))
-		unless UNIVERSAL::isa ($value, $expected_type);
-	    return $value;
-
+	# first process cases when an expected type is a simple string,
+	# integer etc. (not SADI::Data::String etc.) - e.g. when an ID
+	# attribute is being set
+	if ( $expected_type eq STRING ) {
+		return $value;
+	} elsif ( $expected_type eq INTEGER ) {
+		$self->throw( $self->_wrong_type_msg( $value, $expected_type, $name ) )
+		  unless $value =~ m/^\s*[+-]?\s*\d+\s*$/;
+		$value =~ s/\s//g;
+		return $value;
+	} elsif ( $expected_type eq FLOAT ) {
+		$self->throw( $self->_wrong_type_msg( $value, $expected_type, $name ) )
+		  unless $value =~
+			  m/^\s*[+-]?\s*(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?\s*$/;
+		$value =~ s/\s//g;
+		return $value;
+	} elsif ( $expected_type eq BOOLEAN ) {
+		return ( $value =~ /true|\+|1|yes|ano/ ? '1' : '0' );
+	} elsif ( $expected_type eq DATETIME ) {
+		my $iso;
+		eval {
+			$iso = (
+					 HTTP::Date::time2isoz(
+						  HTTP::Date::str2time( HTTP::Date::parse_date($value) )
+					 )
+			);
+		};
+		$self->throw( $self->_wrong_type_msg( $value, 'ISO-8601', $name ) )
+		  if $@;
+		return $iso;    ### $iso =~ s/ /T/;  ??? TBD
 	} else {
-	    # e.g. $sequence->Length (value => 12, id => 'IR64')
-	    return $self->create_member ($name, $expected_type, @values);
 
+		# Then process cases when the expected type is a name of a
+		# real object (e.g. SADI::Data::String); for these cases the
+		# $value[0] can be already such object - in which case nothing
+		# to be done; or $value[0] can be HASH, or @values can be a
+		# list of name/value pairs, in which case a new object (of
+		# type $expected_type) has to be created and initialized by
+		# @values; and, still in the latter case, if the @values has
+		# just one element (XX), this element is considered a 'value':
+		# it is treated as a a hash {value => XX}.
+		return $value if UNIVERSAL::isa( $value, $expected_type );
+		$value = { value => $value }
+		  unless ref($value) || @values > 1;
+		my ($value_ref_type) = ref($value);
+		if ( $value_ref_type eq 'HASH' ) {
+
+			# e.g. $sequence->Length ( { value => 12, id => 'IR64'} )
+			return $self->create_member( $name, $expected_type, %$value );
+		} elsif ( $value_ref_type eq 'ARRAY' ) {
+
+			# e.g. $sequence->Length ( [ value => 12, id => 'IR64'] )
+			return $self->create_member( $name, $expected_type, @$value );
+		} elsif ($value_ref_type) {
+
+			# e.g. $sequence->Length ( new SADI::Data::Integer ( value => 12) )
+			$self->throw(
+						  $self->_wrong_type_msg(
+										  $value_ref_type, $expected_type, $name
+						  )
+			) unless UNIVERSAL::isa( $value, $expected_type );
+			return $value;
+		} else {
+
+			# e.g. $sequence->Length (value => 12, id => 'IR64')
+			return $self->create_member( $name, $expected_type, @values );
+		}
 	}
-    }
 }
 
 #-----------------------------------------------------------------
 #
 #-----------------------------------------------------------------
 sub create_member {
-    my ($self, $name, $expected_type, @values) = @_;
-    eval "require $expected_type";
-    $self->throw ($self->_wrong_type_msg ($values[0], $expected_type, $name))
-	if $@;
-    return "$expected_type"->new (@values);
+	my ( $self, $name, $expected_type, @values ) = @_;
+	eval "require $expected_type";
+	$self->throw( $self->_wrong_type_msg( $values[0], $expected_type, $name ) )
+	  if $@;
+	return "$expected_type"->new(@values);
 }
 
 #-----------------------------------------------------------------
 # as_string (an "" operator overloading)
 #-----------------------------------------------------------------
 my $DUMPER;
+
 BEGIN {
-    use Dumpvalue;
-    use IO::String;
-    $DUMPER = Dumpvalue->new();
-#    $DUMPER->set (veryCompact => 1);
-}
-sub as_string {
-    my $self = shift;
-    my $dump_str;
-    my $io = IO::String->new (\$dump_str);
-    my $oio = select ($io);
-    $DUMPER->dumpValue (\$self);
-    select ($oio);
-    return $dump_str;
+	use Dumpvalue;
+	use IO::String;
+	$DUMPER = Dumpvalue->new();
+
+	#    $DUMPER->set (veryCompact => 1);
 }
 
+sub as_string {
+	my $self = shift;
+	my $dump_str;
+	my $io  = IO::String->new( \$dump_str );
+	my $oio = select($io);
+	$DUMPER->dumpValue( \$self );
+	select($oio);
+	return $dump_str;
+}
 1;
 __END__
 
@@ -827,6 +925,31 @@ Without any parameter, it stringifies the caller object
 #   and call 'module_name_escape' to substitute bad characters.
 #   The result is a valid Perl module name that can represent
 #   the given SADI data type.
+#
+#-----------------------------------------------------------------
+
+#-----------------------------------------------------------------
+# oProperty2module
+#
+#   Prefix given an object property name with a package name SADI::DATA::OWL,
+#   and call 'module_name_escape' to substitute bad characters.
+#   The result is a valid Perl module name that can represent
+#   the given object property.
+#
+#-----------------------------------------------------------------
+
+#-----------------------------------------------------------------
+# uri2package
+#
+#   Takes a uri and creates a suitable package string from it.
+#   This string can then be used as is, or as a prefix/suffix
+#   to an existing package string.
+#   
+#   Example:
+#    uri given: 
+#      http://sadiframework.org/examples/regression.owl#DatedValue   
+#    package returned:
+#      sadiframework::org::examples::regression::owl
 #
 #-----------------------------------------------------------------
 
