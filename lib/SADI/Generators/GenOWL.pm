@@ -4,7 +4,7 @@
 #
 # For copyright and disclaimer see below.
 #
-# $Id: GenOWL.pm,v 1.13 2009-11-10 18:26:48 ubuntu Exp $
+# $Id: GenOWL.pm,v 1.14 2009-11-23 18:39:27 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Generators::GenOWL;
 use SADI::Utils;
@@ -19,7 +19,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.13 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.14 $ =~ /: (\d+)\.(\d+)/;
 
 #-----------------------------------------------------------------
 # A list of allowed attribute names. See SADI::Base for details.
@@ -77,7 +77,7 @@ sub generate_object_property {
 	my $input = SADI::Utils->find_file( $Bin, 'SADI', 'Generators', 'templates',
 										'sadi-object-property.tt' );
 	my $name = $property->name();
-	$LOG->info("\tGenerating object property for $name\n");
+	$LOG->debug("\tGenerating object property for $name\n");
 	my $module_name = $property->module_name();
 
 	# create implementation specific object
@@ -108,7 +108,7 @@ sub generate_object_property {
 					  },
 					  $outfile
 		) || $LOG->logdie( $tt->error() );
-		$LOG->info("Created $outfile\n");
+		$LOG->debug("Created $outfile\n");
 	}
 }
 
@@ -138,7 +138,7 @@ sub generate_class {
     my $input = SADI::Utils->find_file( $Bin, 'SADI', 'Generators', 'templates',
                                         'sadi-class.tt' );
     my $name = $property->name();
-    $LOG->info("\tGenerating module for owl class $name\n");
+    $LOG->debug("\tGenerating module for owl class $name\n");
     my $module_name = $property->module_name();
 
     # create implementation specific object
@@ -200,7 +200,7 @@ sub generate_datatype_property {
     my $input = SADI::Utils->find_file( $Bin, 'SADI', 'Generators', 'templates',
                                         'sadi-datatype-property.tt' );
     my $name = $property->name();
-    $LOG->info("\tGenerating datatype property for $name\n");
+    $LOG->debug("\tGenerating datatype property for $name\n");
     my $module_name = $property->module_name();
 
     # create implementation specific object
@@ -231,7 +231,7 @@ sub generate_datatype_property {
                       },
                       $outfile
         ) || $LOG->logdie( $tt->error() );
-        $LOG->info("Created $outfile\n");
+        $LOG->debug("Created $outfile\n");
     }
 }
 

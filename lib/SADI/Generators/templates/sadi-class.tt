@@ -169,7 +169,7 @@ __END__
   $class->[% child.name %];
 [% END %][% END %]
   
-[% IF obj.datatype_properties -%]
+[% IF obj.object_properties -%]
   # add object properties 
 [% FOREACH child IN obj.object_properties -%]
   use [% child.module_name; %]

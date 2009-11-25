@@ -4,7 +4,7 @@
 #         Martin Senger <martin.senger@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: Base.pm,v 1.19 2009-11-13 18:02:40 ubuntu Exp $
+# $Id: Base.pm,v 1.20 2009-11-18 19:13:15 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Base;
 use strict;
@@ -32,8 +32,8 @@ use overload q("")    => "as_string";
 BEGIN {
 	@ISA      = qw( Exporter );
 	@EXPORT   = qw( $LOG );
-	$VERSION  = sprintf "%d.%02d", q$Revision: 1.19 $ =~ /: (\d+)\.(\d+)/;
-	$Revision = '$Id: Base.pm,v 1.19 2009-11-13 18:02:40 ubuntu Exp $';
+	$VERSION  = sprintf "%d.%02d", q$Revision: 1.20 $ =~ /: (\d+)\.(\d+)/;
+	$Revision = '$Id: Base.pm,v 1.20 2009-11-18 19:13:15 ubuntu Exp $';
 
 	# initiate error handling
 	require Carp;
@@ -211,7 +211,8 @@ sub uri2package {
 
 	# the thing after the # if it exists
 	my $frag = $u1->fragment || '';
-
+	$frag =~ s/^\/*//g;
+	
 	# convert . to _
 	$frag =~ s/\./_/g if $frag;
 

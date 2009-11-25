@@ -3,7 +3,7 @@
 # Author: Edward Kawas
 # For copyright and disclaimer see below.
 #
-# $Id: SADI.pm,v 1.22 2009-10-02 15:53:46 ubuntu Exp $
+# $Id: SADI.pm,v 1.23 2009-11-23 18:40:23 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::SADI;
 use strict 'vars';
@@ -13,7 +13,7 @@ use vars qw{$VERSION};
 
 BEGIN {
 	use vars qw{@ISA @EXPORT @EXPORT_OK};
-	$VERSION = sprintf "%d.%02d", q$Revision: 1.22 $ =~ /: (\d+)\.(\d+)/;
+	$VERSION = sprintf "%d.%02d", q$Revision: 1.23 $ =~ /: (\d+)\.(\d+)/;
 	*SADI::SADI::VERSION = *VERSION;
 }
 
@@ -300,9 +300,6 @@ The other modules needed are (all available from the CPAN):
 =item * Log::Log4perl 
 	- a wonderful port of the famous log4j Java logging system.
 
-=item * Template
-    - a modern Perl Template Toolkit, a really fascinating tool.
-
 =item * Config::Simple
      - for a simple service configuration
 
@@ -435,7 +432,9 @@ Perl Moses generates Perl code. Actually, up to four pieces of the code:
 
 =head4 Perl Datatypes Representing OWL classes for SADI services
 
-Actually, this is not done yet. Sorry!
+SADISeS allows for easier implementation of SADI services by allowing you to use automatically generated PERL modules representing OWL classes in your service implementation.
+
+The Generated perl modules that represent OWL classes have their own constructors, contain getter and setters for their datatype properties, and even have range checking for object properties. While the generator isn''t perfect, it will do the job in most cases; making your service provision much more simple.
 
 =cut
 
@@ -587,7 +586,7 @@ This script does not do much but gives you overview of your configuration and in
 =begin html
 
 <pre>
-Perl-SADI VERSION: 1.04
+Perl-SADI VERSION: 0.96
 
 Configuration
 -------------
@@ -659,6 +658,40 @@ Testing log messages (some may go only to a logfile):
 </pre>
 
 =end html
+
+=cut
+
+=head4 sadi-generate-datatypes.pl
+
+This script is really important for those of you wishing to use PERL modules representing your OWL classes.
+
+Basically, this script reads your OWL file and processes all of the OWL classes and properties specified in that file. Once the processing is complete, PERL modules representing those classes and properties are either written to disk or displayed on screen.
+
+One obvious question is "B<where are these perl objects generated>"?
+
+You can always determine this after generation by looking in the log file - the message has the INFO level which means it is almost always logged. But, if you want to know in advance here are the rules:
+
+=over
+
+=item If there is a generators.outdir parameter in the configuration file, it is used. It defines the directory where OWL classes and properties are created.
+
+=item Otherwise, program is trying to find an existing directory named 'generated' anywhere in the @INC (a set of directories used by Perl to locate its modules).
+
+=item If it fails, it creates a new directory 'generated' in the "current" directory.
+
+=back
+
+You can use option I<-s> to get the generated result directly on the screen (in that case no file is created).
+
+To generate OWL classes and properties from a remote url, you would use the B<-u> option. This option sets the base URI for the OWL file to be the URL to the OWL file (if one didn't already exist).
+
+If the file you would like to generate classes and properties from resides on your disk, then you would use not specify any option. If the local file doesn't specify a base URI for the ontology, you can do this with the B<-b> flag. When the script executes, it will prompt you for a URI.
+
+More often than not, your ontology will contain import statements. If you wish to follow them, you need to set the B<-i> flag. This flag tells the script to process import statements, so make sure that you have an internet connection if the referenced files are located somewhere remote.  
+
+Like the other SADI scripts included in this distribution, you can access the script help page by running the script with the B<-h> flag.
+
+For more information on the perl OWL modules that were generated, read the perldoc for the class or property of interest!
 
 =cut
 
@@ -1131,7 +1164,7 @@ re-create it. Here is a whole script (for HelloSadiWorld):
 # It includes some hard-coded paths - they were added during the
 # generate service call.
 #
-# $Id: SADI.pm,v 1.22 2009-10-02 15:53:46 ubuntu Exp $
+# $Id: SADI.pm,v 1.23 2009-11-23 18:40:23 ubuntu Exp $
 # Contact: Edward Kawas &lt;edward.kawas@gmail.com&gt;
 # ---------------------------------------------------------------
 

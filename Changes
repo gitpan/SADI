@@ -1,6 +1,26 @@
 Revision history for Perl extension SADI.
 
-0.94
+0.96
+    - noticed that i neglected to include
+      a couple of changes. specifically,
+      the header in service-cgi-async.tt
+      isnt set properly, so 500 error will
+      happen each time.
+    - add $Data::Dumper::Purity =1 to
+      the store method in async service
+      base.
+    - added the ability for sadi-generate-datatypes
+      to follow owl import statements using command
+      line switch -i
+    - when parsing owl from URL, that URL will be used
+      as the base URL if one isnt defined in the OWL 
+      document.
+    - when parsing owl from a file, if -b is specified,
+      then user is prompted for base URI.
+    - updated the template for object properties to remove
+      some of the code in the synopsis
+
+0.95
     - in the tutorials, fixed a couple 
       more typos; bolded some sections.
     - added RDF to describe internal errors
@@ -8,6 +28,10 @@ Revision history for Perl extension SADI.
     - introduced sadi-generate-datatypes script
       this script takes RDF/OWL and produces
       modules that you can use in SADISeS.
+      
+      This script does produce modules from
+      owl documents, but it isnt foolproof!
+      
     - Added to SADI::RDF::Core, the ability to
       add output data of type 
       SADI::Data::OWL::Class.

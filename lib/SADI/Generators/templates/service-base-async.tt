@@ -54,6 +54,7 @@ sub store {
     my %hash;
     $hash{value} = $core->serializeOutputModel();
     $hash{done} = $is_finished ? 1 : 0;
+    $Data::Dumper::Purity = 1;
     my $str = Data::Dumper->Dump( [ \%hash ], ['*Data'] );
     $store->add($uid, $str);
 }

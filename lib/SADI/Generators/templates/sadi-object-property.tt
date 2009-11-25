@@ -78,13 +78,6 @@ __END__
   # get the uri for this property
   my $uri = $property->uri;
 
-  [% IF obj.uri %]
-  # set a subject URI that 
-  # [% obj.uri %] is 
-  # a predicate on 
-  $property->value('http://some.domain/resource#myResource');
-  [% END %]
-
 =head1 DESCRIPTION
 
 I<Inherits from>: L<[% obj.parent %]|[% obj.module_parent %]>
