@@ -1,5 +1,21 @@
 Revision history for Perl extension SADI.
 
+0.97
+   - bug fix: sadi-install.pl; changed 0666 to 0777
+     in chmod for async directory so that webserver
+     can read it.
+   - bug fix: in sadi-class.tt, added a defined check
+     in get_statements for object/datatype property
+     arrays
+   - added a label attribute to generated owl classes
+     so that labels can be added to resources if one
+     wishes to do so.
+   - fixed the service signature so that we dont 
+     indicate that we consume instances, but classes
+   - changed how input data to our services was read
+     in. The module CGI was mangling our data when
+     data was posted to the service.  
+
 0.96
     - noticed that i neglected to include
       a couple of changes. specifically,

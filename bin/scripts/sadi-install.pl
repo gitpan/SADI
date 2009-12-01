@@ -2,7 +2,7 @@
 #
 # Prepare the stage...
 #
-# $Id: sadi-install.pl,v 1.3 2009-09-18 16:16:41 ubuntu Exp $
+# $Id: sadi-install.pl,v 1.4 2009-11-27 16:23:32 ubuntu Exp $
 # Contact: Edward Kawas <edward.kawas+sadi@gmail.com>
 # -----------------------------------------------------------
 
@@ -231,7 +231,7 @@ eval {
         mkdir($dir)
           || die( "Error creating service async directory '" . $dir . "':\n$!" );
     }
-    chmod 0666, $async_dir;
+    chmod 0777, $async_dir;
 };
 say $@ ? $@ : "Created service async directory '$sadi_home/async'.";
 

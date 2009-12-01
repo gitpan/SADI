@@ -3,7 +3,7 @@
 # Author: Edward Kawas <edward.kawas@gmail.com>,
 # For copyright and disclaimer see below.
 #
-# $Id: Class.pm,v 1.3 2009-11-13 18:16:00 ubuntu Exp $
+# $Id: Class.pm,v 1.4 2009-11-27 20:20:48 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Data::OWL::Class;
 use base ("SADI::Base");
@@ -14,7 +14,7 @@ use RDF::Core::Statement;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.3 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -62,7 +62,10 @@ Details are in L<SADI::Base>. Here just a list of them:
 
 {
 	my %_allowed = (
-		type  => { type => SADI::Base->STRING },
+	   # the RDFS label for this node
+	   label  => { type => SADI::Base->STRING },
+	   
+	   type  => { type => SADI::Base->STRING },
 		# value and uri are synonyms here
 		value => {
 			type => SADI::Base->STRING,

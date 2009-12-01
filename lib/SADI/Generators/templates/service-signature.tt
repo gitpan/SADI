@@ -61,9 +61,7 @@
                 <rdf:Description rdf:about="[% name %]_[% authority %]_[% GET COUNTER %]">[% SET COUNTER = COUNTER+1 %]
                     <rdf:type rdf:resource="http://www.mygrid.org.uk/mygrid-moby-service#parameter"/>
                     <a:objectType>
-                        <rdf:Description rdf:about="[% name %]_[% authority %]_[% GET COUNTER %]">[% SET COUNTER = COUNTER+1 %]
-                            <rdf:type rdf:resource="[% input %]"/>
-                        </rdf:Description>
+                        <rdf:Description rdf:about="[% input %]"/>
                     </a:objectType>
                 </rdf:Description>
             </a:inputParameter>
@@ -71,9 +69,7 @@
                 <rdf:Description rdf:about="[% name %]_[% authority %]_[% GET COUNTER %]">[% SET COUNTER = COUNTER+1 %]
                     <rdf:type rdf:resource="http://www.mygrid.org.uk/mygrid-moby-service#parameter"/>
                     <a:objectType>
-                        <rdf:Description rdf:about="[% name %]_[% authority %]_[% GET COUNTER %]">[% SET COUNTER = COUNTER+1 %]
-                            <rdf:type rdf:resource="[% output %]"/>
-                        </rdf:Description>
+                        <rdf:Description rdf:about="[% output %]"/>
                     </a:objectType>
                 </rdf:Description>
             </a:outputParameter>

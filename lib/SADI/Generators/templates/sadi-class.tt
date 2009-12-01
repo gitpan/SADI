@@ -101,39 +101,59 @@ sub _get_statements {
     # create a named resource or bnode for this object ....
     my $subject = new RDF::Core::Resource( $self->value ) if defined $self->value and $self->value ne '';
     $subject = new RDF::Core::NodeFactory()->newResource unless defined $self->value and $self->value ne '';
+    
     # set the subject so that this sub graph can be linked to other graphs
     $self->subject($subject);
-    my $predicate = $subject->new( SADI::RDF::Predicates::RDF->type );
-    my $object = new RDF::Core::Resource( $self->type );
     
-    $self->add_statements(new RDF::Core::Statement($subject, $predicate, $object));
+    # add the type
+    $self->add_statements(
+        new RDF::Core::Statement(
+            $subject,
+            $subject->new( SADI::RDF::Predicates::RDF->type ),
+            new RDF::Core::Resource( $self->type )
+        )
+    );
+    # add a label if one is specified
+    if (defined $self->label()) {
+    	$self->add_statements(
+    	   new RDF::Core::Statement(
+            $subject,
+            $subject->new( SADI::RDF::Predicates::RDFS->label ),
+            new RDF::Core::Resource( $self->label )
+           )
+        );
+    }
     
     # for each attribute, if is array do:
 [% FOREACH child IN obj.object_properties -%]
-    foreach (@{$self->[%- child.name -%]}) {
-        # add all statements from $_
-        $self->add_statements($_->_get_statements) if $_->_get_statements;
-        # add a statement linking the graphs
-        $self->add_statements(
-          new RDF::Core::Statement(
-              $subject,
-              $subject->new('[%- child.uri -%]'), 
-              $_->subject
-          )
-        );
+    if (defined $self->[%- child.name -%]){
+	    foreach (@{$self->[%- child.name -%]}) {
+	        # add all statements from $_
+	        $self->add_statements($_->_get_statements) if $_->_get_statements;
+	        # add a statement linking the graphs
+	        $self->add_statements(
+	          new RDF::Core::Statement(
+	              $subject,
+	              $subject->new('[%- child.uri -%]'), 
+	              $_->subject
+	          )
+	        );
+	    }
     }
 [% END -%]
 [% FOREACH child IN obj.datatype_properties -%]
-    foreach (@{$self->[%- child.name -%]}) {
-        $self->add_statements(
-          new RDF::Core::Statement(
-              $subject,
-              $subject->new('[%- child.uri -%]'), 
-              new RDF::Core::Literal( 
-                $_->value, undef, (defined $_->range ? $_->range : undef) 
-              ),
-          )
-        );
+    if (defined $self->[%- child.name -%]){
+	    foreach (@{$self->[%- child.name -%]}) {
+	        $self->add_statements(
+	          new RDF::Core::Statement(
+	              $subject,
+	              $subject->new('[%- child.uri -%]'), 
+	              new RDF::Core::Literal( 
+	                $_->value, undef, (defined $_->range ? $_->range : undef) 
+	              ),
+	          )
+	        );
+	    }
     }
 [% END -%]
     # add parent statements too

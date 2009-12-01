@@ -6,7 +6,7 @@
 # It includes some hard-coded paths - they were added during the
 # generate service call.
 #
-# $Id: service-cgi.tt,v 1.9 2009-09-03 19:55:26 ubuntu Exp $
+# $Id: service-cgi.tt,v 1.10 2009-12-01 19:44:31 ubuntu Exp $
 # Contact: Edward Kawas <edward.kawas@gmail.com>
 # ---------------------------------------------------------------
 [%# A template for a sadi service.
@@ -48,9 +48,6 @@ $CGI::POST_MAX=1024 * 1024 * 10;  # max 10MB posts
 # here we require the service module and add it to ISA hierarchy
 use base 'Service::[% obj.ServiceName %]';
 
-# get the cgi variable
-my $q = new CGI;
-
 # if this is a GET, send the service interface
 if ($ENV{REQUEST_METHOD} eq 'GET') {
     # send the signature for this service
@@ -63,10 +60,11 @@ if ($ENV{REQUEST_METHOD} eq 'GET') {
 } else {
     # call the service
     # get the data from the 'data' parameter or from POSTDATA
-    my $data = $q->param('data') || $q->param('POSTDATA') || "";
+    my $data = join "",<>;
     # call the service
     my $x =  __PACKAGE__->[% obj.ServiceName %]($data);
     # print the results
+    my $q = new CGI;
     print $q->header(-type=>'text/xml');
     print $x;
 }
