@@ -4,7 +4,7 @@
 #         Edward Kawas
 # For copyright and disclaimer see below.
 #
-# $Id: Core.pm,v 1.12 2009-10-29 18:07:28 ubuntu Exp $
+# $Id: Core.pm,v 1.13 2009-12-03 18:42:36 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::RDF::Core;
 use strict;
@@ -30,7 +30,7 @@ use base ("SADI::Base");
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.12 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.13 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -405,14 +405,13 @@ sub getObjects {
 
   args
      
-     node => $URI  (the URI string or RDF::Core::Resource of the subject node) OR
-             a SADI::Data::OWL::Class (object generated using sadi-generate-datatypes).
+     node => $URI  (the URI string, RDF::Core::Resource of the subject node or 
+             a SADI::Data::OWL::Class (object generated using sadi-generate-datatypes)).
              In the event of an OWL class, all other args are ignored.
      
      value => $val  (a string value)
      
-     predicate => $URI (optional - the predicate to put between them.  
-                        Defaults to $self->ServicePredicate)
+     predicate => $URI (required unless node isa SADI::Data::OWL::Class- the predicate to put between them.)
      
      typed_as_output => boolean (if present output is rdf:typed as output class)
      
@@ -453,45 +452,49 @@ sub addOutputData {
 	my $predicate =
 	  $predicate_sent
 	  ? RDF::Core::Resource->new($predicate_sent)
-	  : RDF::Core::Resource->new( $self->Signature->ServicePredicate );
-
-	if ( ref($object) && ( ref($object) =~ /RDF::Core/ ) )
-	{        # did they send us an objectt of the right type?
-		if ($force_literal)
-		{ # did they want the URI of that object as a literal value (very rare, but why not)
-			my $URI = $object->getURI;
-			$object = RDF::Core::Literal->new($URI);
-
-			my $statement = RDF::Core::Statement->new( $subject, $predicate, $object );
-			$self->_addToModel( statement => $statement );
-		} else {    # they sent an RDF::Core node that we should simply add to the graph
-			my $statement = RDF::Core::Statement->new( $subject, $predicate, $object );
-			$self->_addToModel( statement => $statement );
-			if ($label) {
-				$label = RDF::Core::Literal->new($label);
-				my $lab = RDF::Core::Resource->new(
-										  'http://www.w3.org/2000/01/rdf-schema#label');
-				$statement = RDF::Core::Statement->new( $object, $lab, $label );
+	  : undef;
+	  #: RDF::Core::Resource->new( $self->Signature->ServicePredicate );
+	$LOG->warn("Cannot completely addOutputData() without a predicate!\nPlease check how you are calling addOutputData() and include a predicate!")
+	  unless defined $predicate;
+	if (defined $predicate) {
+		if ( ref($object) && ( ref($object) =~ /RDF::Core/ ) )
+		{        # did they send us an objectt of the right type?
+			if ($force_literal)
+			{ # did they want the URI of that object as a literal value (very rare, but why not)
+				my $URI = $object->getURI;
+				$object = RDF::Core::Literal->new($URI);
+	
+				my $statement = RDF::Core::Statement->new( $subject, $predicate, $object );
+				$self->_addToModel( statement => $statement );
+			} else {    # they sent an RDF::Core node that we should simply add to the graph
+				my $statement = RDF::Core::Statement->new( $subject, $predicate, $object );
+				$self->_addToModel( statement => $statement );
+				if ($label) {
+					$label = RDF::Core::Literal->new($label);
+					my $lab = RDF::Core::Resource->new(
+											  'http://www.w3.org/2000/01/rdf-schema#label');
+					$statement = RDF::Core::Statement->new( $object, $lab, $label );
+					$self->_addToModel( statement => $statement );
+				}
+			}
+		} else {    # they sent a literal value... is it a URI-type thing?
+			if ( $object =~ /\S+\:\S+\.\S+/ && !$force_literal )
+			{ # a terrible regexp for a URI... should find the one that is sanctioned by the W3C URI RFC... look for it later...
+				$object = RDF::Core::Resource->new($object);
+				my $statement = RDF::Core::Statement->new( $subject, $predicate, $object );
+				$self->_addToModel( statement => $statement );
+				if ($label) {
+					$label = RDF::Core::Literal->new($label);
+					my $lab = RDF::Core::Resource->new(
+											  'http://www.w3.org/2000/01/rdf-schema#label');
+					$statement = RDF::Core::Statement->new( $object, $lab, $label );
+					$self->_addToModel( statement => $statement );
+				}
+			} else {
+				$object = RDF::Core::Literal->new($object);
+				my $statement = RDF::Core::Statement->new( $subject, $predicate, $object );
 				$self->_addToModel( statement => $statement );
 			}
-		}
-	} else {    # they sent a literal value... is it a URI-type thing?
-		if ( $object =~ /\S+\:\S+\.\S+/ && !$force_literal )
-		{ # a terrible regexp for a URI... should find the one that is sanctioned by the W3C URI RFC... look for it later...
-			$object = RDF::Core::Resource->new($object);
-			my $statement = RDF::Core::Statement->new( $subject, $predicate, $object );
-			$self->_addToModel( statement => $statement );
-			if ($label) {
-				$label = RDF::Core::Literal->new($label);
-				my $lab = RDF::Core::Resource->new(
-										  'http://www.w3.org/2000/01/rdf-schema#label');
-				$statement = RDF::Core::Statement->new( $object, $lab, $label );
-				$self->_addToModel( statement => $statement );
-			}
-		} else {
-			$object = RDF::Core::Literal->new($object);
-			my $statement = RDF::Core::Statement->new( $subject, $predicate, $object );
-			$self->_addToModel( statement => $statement );
 		}
 	}
 	if ($add_type_data) {

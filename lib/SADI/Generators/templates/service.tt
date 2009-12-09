@@ -126,8 +126,8 @@ use SADI::RDF::Predicates::RDFS;
 #                          for this resource are added to our model and all 
 #                          other arguments are ignored!
 #                     value => $val  (a string value)
-#                     predicate => $URI (optional - the predicate to put between them.  
-#                                        Defaults to $self->ServicePredicate)
+#                     predicate => $URI (required - the predicate to put between them.  
+#                                        unless your $URI->isa(SADI::Data::OWL::Class))
 #                     typed_as_output => boolean (if present output is rdf:typed as output class)
 #                     force_literal => boolean
 #                     label => $label (string); label for value node, only if value is a URI

@@ -31,9 +31,9 @@ use SADI::Data::Float;
 use SADI::Data::Boolean;
 use SADI::Data::DateTime;
 
-[% FOREACH child IN obj.object_properties -%]
+[% FOREACH child IN obj.object_properties %]
 use [% child.module_name %];[% END %]
-[% FOREACH child IN obj.datatype_properties -%]
+[% FOREACH child IN obj.datatype_properties %]
 use [% child.module_name %];[% END %]
 
 {
@@ -119,7 +119,7 @@ sub _get_statements {
     	   new RDF::Core::Statement(
             $subject,
             $subject->new( SADI::RDF::Predicates::RDFS->label ),
-            new RDF::Core::Resource( $self->label )
+            new RDF::Core::Literal( $self->label )
            )
         );
     }

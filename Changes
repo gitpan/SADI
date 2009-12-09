@@ -1,5 +1,19 @@
 Revision history for Perl extension SADI.
 
+0.98
+   - sadi-class.tt: 
+       * fixed template formating
+       * ->label() was using Resoruce and not Literal
+   - addOutputData
+       * removed call to ServicePredicate
+       * added warning when calling method without predicate
+       * updated the doc to reflect that predicate is required
+   - service.tt / service-async.tt updated the doc (like in Core.pm) 
+   - Base.pm: bug fix-> remove ~ from paths and package names
+   - updated the service-definition.tt file; added a new header
+     and wrapped the input/output class in double quotes; placed
+     the description in double quotes too.  
+
 0.97
    - bug fix: sadi-install.pl; changed 0666 to 0777
      in chmod for async directory so that webserver

@@ -120,8 +120,8 @@ use SADI::RDF::Predicates::RDFS;
 #                  args
 #                     node => $URI  (the URI string or RDF::Core::Resource of the subject node)
 #                     value => $val  (a string value)
-#                     predicate => $URI (optional - the predicate to put between them.  
-#                                        Defaults to $self->ServicePredicate)
+#                     predicate => $URI (required - the predicate to put between them.  
+#                                        unless your $URI->isa(SADI::Data::OWL::Class))
 #                     typed_as_output => boolean (if present output is rdf:typed as output class)
 #                     force_literal => boolean
 #                     label => $label (string); label for value node, only if value is a URI
@@ -154,7 +154,7 @@ sub process_it {
         	    predicate => "http://sadiframework.org/ontologies/predicates.owl#somePredicate$output"
         	);
 
-        	# store takes in $core
+        	# store takes in $core and is used to save your results
         	$self->store($core);
         	# mimic long running service - sleep 15 seconds per addition of output
         	sleep(15);
