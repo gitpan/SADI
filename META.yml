@@ -44,4 +44,4 @@ requires:
   URI: 1.40
   Unicode::String: 2.09
   Want: 0.18
-version: 0.98
+version: 0.98.1

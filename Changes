@@ -1,5 +1,7 @@
 Revision history for Perl extension SADI.
 
+0.98.1
+  - Base.pm: bug fix-> remove ~ from paths and package names
 0.98
    - sadi-class.tt: 
        * fixed template formating

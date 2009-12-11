@@ -4,7 +4,7 @@
 #         Martin Senger <martin.senger@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: Base.pm,v 1.21 2009-12-03 18:44:11 ubuntu Exp $
+# $Id: Base.pm,v 1.22 2009-12-11 15:02:40 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Base;
 use strict;
@@ -32,8 +32,8 @@ use overload q("")    => "as_string";
 BEGIN {
 	@ISA      = qw( Exporter );
 	@EXPORT   = qw( $LOG );
-	$VERSION  = sprintf "%d.%02d", q$Revision: 1.21 $ =~ /: (\d+)\.(\d+)/;
-	$Revision = '$Id: Base.pm,v 1.21 2009-12-03 18:44:11 ubuntu Exp $';
+	$VERSION  = sprintf "%d.%02d", q$Revision: 1.22 $ =~ /: (\d+)\.(\d+)/;
+	$Revision = '$Id: Base.pm,v 1.22 2009-12-11 15:02:40 ubuntu Exp $';
 
 	# initiate error handling
 	require Carp;
@@ -158,7 +158,7 @@ sub toString {
 sub module_name_escape {
 	my ( $self, $name ) = @_;
 	$name =~ tr/-/_/;
-	$name =~ tr/~//;
+	$name =~ s/~//g;
 	return $name;
 }
 
