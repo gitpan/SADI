@@ -3,7 +3,7 @@
 # Author: Edward Kawas <edward.kawas@gmail.com>,
 # For copyright and disclaimer see below.
 #
-# $Id: Class.pm,v 1.4 2009-11-27 20:20:48 ubuntu Exp $
+# $Id: Class.pm,v 1.5 2009-12-18 19:49:15 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Data::OWL::Class;
 use base ("SADI::Base");
@@ -14,7 +14,7 @@ use RDF::Core::Statement;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.5 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -48,7 +48,9 @@ Details are in L<SADI::Base>. Here just a list of them:
 
 =over
 
-=item B<type> a URI that describes the type of this clas
+=item B<label> an optional RDF label for this class
+
+=item B<type> a URI that describes the type of this class
 
 =item B<value> a URI to an individual of this class (same as uri, e.g. if you set this, you set value too)
 

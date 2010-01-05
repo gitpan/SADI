@@ -3,7 +3,7 @@
 # Author: Edward Kawas <edward.kawas@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: ServiceBase.pm,v 1.6 2009-08-25 21:58:54 ubuntu Exp $
+# $Id: ServiceBase.pm,v 1.7 2009-12-18 19:49:23 ubuntu Exp $
 #-----------------------------------------------------------------
 
 package SADI::Service::ServiceBase;
@@ -15,7 +15,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.6 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.7 $ =~ /: (\d+)\.(\d+)/;
 
 #-----------------------------------------------------------------
 # process_it
@@ -46,7 +46,7 @@ sub as_uni_string {
 #-----------------------------------------------------------------
 
 my @ENV_TO_REPORT =
-  ( 'REMOTE_ADDR', 'HTTP_USER_AGENT', 'CONTENT_LENGTH', 'CONTENT_TYPE' );
+  ( 'REMOTE_ADDR', 'REQUEST_URI' ,'HTTP_USER_AGENT', 'CONTENT_LENGTH', 'CONTENT_TYPE' );
 
 sub log_request {
 	my ($self) = shift;

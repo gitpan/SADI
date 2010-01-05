@@ -9,6 +9,7 @@ doc/async_service_auto_advanced.html
 doc/sync_service.html
 doc/sync_service_advanced.html
 doc/sync_service_auto_advanced.html
+doc/working_with_datatypes.html
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm
@@ -54,7 +55,6 @@ lib/SADI/Generators/templates/service-signature.tt
 lib/SADI/Generators/templates/service.tt
 lib/SADI/OWL/OntologyParser.pm
 lib/SADI/OWL/SADIServiceParser.pm
-lib/SADI/RDF/.cvsignore
 lib/SADI/RDF/Core.pm
 lib/SADI/RDF/Predicates/DC_PROTEGE.pm
 lib/SADI/RDF/Predicates/FETA.pm

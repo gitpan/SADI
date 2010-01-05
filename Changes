@@ -1,11 +1,16 @@
 Revision history for Perl extension SADI.
 
+0.99
+  - added REQUEST_URI to log_request in ServiceBase.
+  - fixed some typos in perldoc
+  - added a tutorial on working with generated datatypes
+  
 0.98.1
   - Base.pm: bug fix-> remove ~ from paths and package names
 0.98
    - sadi-class.tt: 
        * fixed template formating
-       * ->label() was using Resoruce and not Literal
+       * ->label() was using Resource and not Literal
    - addOutputData
        * removed call to ServicePredicate
        * added warning when calling method without predicate
