@@ -4,7 +4,7 @@
 #
 # For copyright and disclaimer see below.
 #
-# $Id: GenOWL.pm,v 1.14 2009-11-23 18:39:27 ubuntu Exp $
+# $Id: GenOWL.pm,v 1.15 2010-01-07 21:51:51 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Generators::GenOWL;
 use SADI::Utils;
@@ -19,7 +19,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.14 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.15 $ =~ /: (\d+)\.(\d+)/;
 
 #-----------------------------------------------------------------
 # A list of allowed attribute names. See SADI::Base for details.
@@ -254,12 +254,14 @@ SADI::Generators::GenOWL - generator of SADI OWL modules
 =head1 SYNOPSIS
 
  use SADI::Generators::GenOWL;
- 
+
 =head1 DESCRIPTION
+
+A generator of SADI OWL modules. This module contains the 'guts' of what is needed to generate PERL modules from OWL entities. 
 
 =head1 AUTHORS, COPYRIGHT, DISCLAIMER
 
- Edward Kawas (edward.kawas [at] gmail [dot] com)
+Edward Kawas (edward.kawas [at] gmail [dot] com)
 
 Copyright (c) 2009 Edward Kawas. All Rights Reserved.
 
@@ -274,9 +276,9 @@ Details are in L<SADI::Base>. Here just a list of them:
 
 =over
 
-=item B<outdir>
+=item B<outdir> A directory where to create generated code.
 
-A directory where to create generated code.
+=back
 
 =head1 SUBROUTINES
 

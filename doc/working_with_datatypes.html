@@ -60,14 +60,14 @@
 # sadi-generate-datatypes.pl example.owl
 
 # our use statements (for completion of this example)
-use purl::oclc::org::SADI::LSRN::AnnotatedGeneID_Record;
+use sadiframework::org::examples::example::owl::AnnotatedGeneID_Record;
 use ontology::dumontierlab::com::hasSymbol;
 use sadiframework::org::ontologies::predicates::owl::hasDescription;
 use sadiframework::org::ontologies::predicates::owl::hasProteinName;
 use sadiframework::org::ontologies::predicates::owl::hasName;
 
 # instantiate a new record
-my $class = new purl::oclc::org::SADI::LSRN::AnnotatedGeneID_Record(&quot;http://some_uri/for/my/record&quot;);
+my $class = new sadiframework::org::examples::example::owl::AnnotatedGeneID_Record(&quot;http://some_uri/for/my/record&quot;);
 
 # set a label
 $class-&gt;label(&quot;this is my label for this record&quot;);
@@ -85,7 +85,7 @@ $class-&gt;add_hasSymbol(ontology::dumontierlab::com::hasSymbol-&gt;new('Another
 # you can still get/set hasDescription(), hasProteinName() and hasName() (all are datatype properties in this example)
 
 # for imaginary hasReference() object property described <a href="#object_properties">here</a>
-$class-&gt;add_hasReference(new purl::oclc::org::SADI::LSRN::AnnotatedGeneID_Record(&quot;http://lsrn.org/Gene:642&quot;));
+$class-&gt;add_hasReference(new sadiframework::org::examples::example::owl::AnnotatedGeneID_Record(&quot;http://lsrn.org/Gene:642&quot;));
 </pre>
 <h3><a name="1"/>Prerequisites</h3>
         <p>Of course, the main prerequisite is that you have installed SADISeS on your machine. SADISeS can be found on <a href="http://search.cpan.org/dist/SADI/" target="_blank">CPAN</a>. When you install this Perl module onto your computer, you will also be prompted to install any missing Perl modules required by SADISeS. After installation, (i.e. make install), you are required to also run a SADI installation script, sadi-install.pl. This is only done the first time that you install SADISeS (and sometimes when you upgrading your SADISeS codebase; Looking at the README or CHANGES will make it obvious as to when this is required).</p>
@@ -192,7 +192,7 @@ Done.</pre>
 <p>All of these methods can be invoked with or without arguments. When invoked without arguments, the methods act as getters. And when a scalar value is used as an argument, the method acts as a setter.</p>
 <pre>
 # instantiate a new record
-my $class = new purl::oclc::org::SADI::LSRN::AnnotatedGeneID_Record(&quot;http://some_uri/for/my/record&quot;);
+my $class = new sadiframework::org::examples::example::owl::AnnotatedGeneID_Record(&quot;http://some_uri/for/my/record&quot;);
 
 # set a label
 $class-&gt;label(&quot;this is my label for this record&quot;);
@@ -374,11 +374,11 @@ use sadiframework::org::ontologies::predicates::owl::hasName;
 ...</pre>
 <p>So our class now has the additional method hasReference and it accepts arguments of type SADI::Data::OWL::Class. In otherwords, you will have to instantiate classes and pass them as arguments to this method.</p>
 <pre># for single values
-$class-&gt;hasReference(purl::oclc::org::SADI::LSRN::AnnotatedGeneID_Record-&gt;new(&quot;http://lsrn.org/Gene:642&quot;));
+$class-&gt;hasReference(sadiframework::org::examples::example::owl::AnnotatedGeneID_Record-&gt;new(&quot;http://lsrn.org/Gene:642&quot;));
 
 # for setting multiple values
-$class-&gt;add_hasReference(purl::oclc::org::SADI::LSRN::AnnotatedGeneID_Record-&gt;new(&quot;http://lsrn.org/Gene:642&quot;));
-$class-&gt;add_hasReference(purl::oclc::org::SADI::LSRN::AnnotatedGeneID_Record-&gt;new(&quot;http://lsrn.org/Gene:123&quot;));</pre>
+$class-&gt;add_hasReference(sadiframework::org::examples::example::owl::AnnotatedGeneID_Record-&gt;new(&quot;http://lsrn.org/Gene:642&quot;));
+$class-&gt;add_hasReference(sadiframework::org::examples::example::owl::AnnotatedGeneID_Record-&gt;new(&quot;http://lsrn.org/Gene:123&quot;));</pre>
 <p>When developing SADI services with SADISeS, you will not have to add the location of generated modules because the entry scripts generated for each service already do this for you. For those of you wishing to use these generated modules on their own, you simply need to add a <em><strong>use lib</strong></em> statement to your Perl script.</p>
 <pre>#for example, 
 use lib '/your_home_directory/Perl-SADI/generated';</pre>

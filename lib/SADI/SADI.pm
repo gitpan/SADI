@@ -3,7 +3,7 @@
 # Author: Edward Kawas
 # For copyright and disclaimer see below.
 #
-# $Id: SADI.pm,v 1.23 2009-11-23 18:40:23 ubuntu Exp $
+# $Id: SADI.pm,v 1.24 2010-01-07 21:59:06 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::SADI;
 use strict 'vars';
@@ -13,7 +13,7 @@ use vars qw{$VERSION};
 
 BEGIN {
 	use vars qw{@ISA @EXPORT @EXPORT_OK};
-	$VERSION = sprintf "%d.%02d", q$Revision: 1.23 $ =~ /: (\d+)\.(\d+)/;
+	$VERSION = sprintf "%d.%02d", q$Revision: 1.24 $ =~ /: (\d+)\.(\d+)/;
 	*SADI::SADI::VERSION = *VERSION;
 }
 
@@ -167,7 +167,7 @@ or,
 C<sadi-generate-services.pl -D HelloSadiWorld>
 
 This will create a definition for your SADI service (in the E<lt>your-home-directoryE<gt>/Perl-SADI/definitions/ directory).
- 
+
 Next create the implementation for the SADI service by doing:
 
 C<sadi-generate-services HelloSadiWorld>
@@ -323,7 +323,7 @@ The other modules needed are (all available from the CPAN):
 
 =item * HTTP::Date 
     - for developing asynchronous moby services I<Optional>
-    
+
 =item *
     Template - for creating RDF, service and definition templates 
 
@@ -395,7 +395,7 @@ All these things can be done manually, at any time. Installation script just mak
 	installing them, however. Perl has a CPAN mechanism in place to do 
 	that. The required modules are listed in requirements. Installation
 	stops if some module is not available.
-	
+
 	* It creates a directory called 'Perl-SADI' in your user directory.
 	Perl SADI will stop working if you move this directory because it 
 	contains vital configuration information inside it.
@@ -752,7 +752,7 @@ With options, you can generated other Perl SADI pieces:
    This is the first thing that you need to generate before generating a service implementation!<p/>
 
    Option <strong>-b</strong> generates <a href="#perl_modules_representing_bases_of_service_implementations">service bases</a>,
-   
+
    Option <strong>-S</strong> generates both <a href="#perl_modules_representing_bases_of_service_implementations">service bases</a> 
    and service implementations. This also influences how the service base will be used at run-time:  
         if it is already generated (with the -S option) there is no need to do it again in the run-time - therefore, the service implementation 
@@ -1164,7 +1164,7 @@ re-create it. Here is a whole script (for HelloSadiWorld):
 # It includes some hard-coded paths - they were added during the
 # generate service call.
 #
-# $Id: SADI.pm,v 1.23 2009-11-23 18:40:23 ubuntu Exp $
+# $Id: SADI.pm,v 1.24 2010-01-07 21:59:06 ubuntu Exp $
 # Contact: Edward Kawas &lt;edward.kawas@gmail.com&gt;
 # ---------------------------------------------------------------
 

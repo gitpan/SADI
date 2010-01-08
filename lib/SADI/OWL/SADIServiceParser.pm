@@ -3,7 +3,7 @@
 # Author: Edward Kawas <edward.kawas@gmail.com>,
 # For copyright and disclaimer see below.
 #
-# $Id: SADIServiceParser.pm,v 1.2 2009-08-27 18:15:33 ubuntu Exp $
+# $Id: SADIServiceParser.pm,v 1.3 2010-01-07 21:30:34 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::OWL::SADIServiceParser;
 use strict;
@@ -26,7 +26,9 @@ use SADI::RDF::Predicates::RDFS;
 use LS::ID;
 
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.3 $ =~ /: (\d+)\.(\d+)/;
+
+=pod
 
 =head1 NAME
 
@@ -71,8 +73,6 @@ parsed and held in memory.
 
 =cut
 
-#-----------------------------------------------------------------
-
 =head1 SUBROUTINES
 
 =cut
@@ -98,6 +98,8 @@ sub new {
 	# done
 	return $self;
 }
+
+=pod
 
 =head2 getServices 
 
@@ -384,4 +386,5 @@ sub getServices {
 }
 
 1;
+
 __END__

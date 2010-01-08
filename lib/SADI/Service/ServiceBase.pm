@@ -3,7 +3,7 @@
 # Author: Edward Kawas <edward.kawas@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: ServiceBase.pm,v 1.7 2009-12-18 19:49:23 ubuntu Exp $
+# $Id: ServiceBase.pm,v 1.8 2010-01-07 21:58:21 ubuntu Exp $
 #-----------------------------------------------------------------
 
 package SADI::Service::ServiceBase;
@@ -15,7 +15,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.7 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.8 $ =~ /: (\d+)\.(\d+)/;
 
 #-----------------------------------------------------------------
 # process_it
@@ -84,8 +84,10 @@ SADI::ServiceBase - a super-class for all SADI services
 =head1 SYNOPSIS
 
  use base qw( SADI::ServiceBase )
- 
+
 =head1 DESCRIPTION
+
+A super class for all SADI services implemented with SADISeS.
 
 =head1 SUBROUTINES
 

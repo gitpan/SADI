@@ -3,7 +3,7 @@
 # Author: Edward Kawas <edward.kawas@gmail.com>,
 # For copyright and disclaimer see below.
 #
-# $Id: DatatypeProperty.pm,v 1.7 2009-11-10 18:23:02 ubuntu Exp $
+# $Id: DatatypeProperty.pm,v 1.8 2010-01-07 21:48:08 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Data::Def::DatatypeProperty;
 use base qw( SADI::Base );
@@ -11,7 +11,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.7 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.8 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -79,6 +79,7 @@ The uri of this datatype property
 =back
 
 =cut
+
 {
 	my %_allowed = (
 		uri => {
@@ -146,6 +147,7 @@ The uri of this datatype property
 =head1 SUBROUTINES
 
 =cut
+
 #-----------------------------------------------------------------
 # init
 #-----------------------------------------------------------------

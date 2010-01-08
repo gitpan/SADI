@@ -4,7 +4,7 @@
 #         Martin Senger <martin.senger@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: Base.pm,v 1.22 2009-12-11 15:02:40 ubuntu Exp $
+# $Id: Base.pm,v 1.23 2010-01-07 21:42:46 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Base;
 use strict;
@@ -32,8 +32,8 @@ use overload q("")    => "as_string";
 BEGIN {
 	@ISA      = qw( Exporter );
 	@EXPORT   = qw( $LOG );
-	$VERSION  = sprintf "%d.%02d", q$Revision: 1.22 $ =~ /: (\d+)\.(\d+)/;
-	$Revision = '$Id: Base.pm,v 1.22 2009-12-11 15:02:40 ubuntu Exp $';
+	$VERSION  = sprintf "%d.%02d", q$Revision: 1.23 $ =~ /: (\d+)\.(\d+)/;
+	$Revision = '$Id: Base.pm,v 1.23 2010-01-07 21:42:46 ubuntu Exp $';
 
 	# initiate error handling
 	require Carp;
@@ -848,6 +848,18 @@ was set to true).
     print $self->format_stack ("Something terrible happen.");
 
 =head1 LOGGING
+
+Logging is available through the $LOG variable create and exported as a result of using this module.
+
+As a service writer, you can $LOG->info('some message'), $LOG->warn('some warning'),
+ $LOG->debug('some debug statement') or $LOG->error('some error message').
+
+The next question is where are these messages sent? SADISeS allows you to 
+configure where to send messages in the log4perl.properties file. When 
+you run sadi-install.pl this module, this file is automatically created 
+for you and placed (usually) in your home directory in a folder called 
+Perl-SADI. If no properties file exists, then the messages are usually 
+placed in STDOUT.
 
 =head1 OTHER SUBROUTINES
 

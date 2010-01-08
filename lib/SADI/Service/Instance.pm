@@ -4,7 +4,7 @@
 #
 # For copyright and disclaimer see below.
 #
-# $Id: Instance.pm,v 1.3 2009-08-27 18:21:31 ubuntu Exp $
+# $Id: Instance.pm,v 1.4 2010-01-07 21:58:21 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Service::Instance;
 
@@ -14,7 +14,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.3 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -26,7 +26,7 @@ SADI::Service::Instance - A module that describes a SADI web service.
 
  # create a new blank SADI service instance object
  my $data = SADI::Service::Instance->new ();
- 
+
  # create a new primed SADI service instance object
  $data = SADI::Service::Instance->new (
      ServiceName => "helloworld",
@@ -42,7 +42,7 @@ SADI::Service::Instance - A module that describes a SADI web service.
      URL => "http://helloworld.com/cgi-bin/helloworld.pl",
      SignatureURL =>"http://foo.bar/myServiceDescription",
  );
- 
+
  # get the service name
  my $name = $data->ServiceName;
  # set the service name
@@ -99,7 +99,7 @@ SADI::Service::Instance - A module that describes a SADI web service.
  $data->SignatureURL($sig);
 
 =head1 DESCRIPTION
-	
+
 An object representing a SADI service signature.
 
 =head1 AUTHORS

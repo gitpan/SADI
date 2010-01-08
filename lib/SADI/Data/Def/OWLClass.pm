@@ -3,7 +3,7 @@
 # Author: Edward Kawas <edward.kawas@gmail.com>,
 # For copyright and disclaimer see below.
 #
-# $Id: OWLClass.pm,v 1.21 2009-11-12 21:17:02 ubuntu Exp $
+# $Id: OWLClass.pm,v 1.22 2010-01-07 21:48:08 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Data::Def::OWLClass;
 use base qw( SADI::Base );
@@ -11,7 +11,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.21 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.22 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -69,6 +69,7 @@ The type of this owl class
 =back
 
 =cut
+
 {
 	my %_allowed = (
 		name => {
@@ -136,6 +137,7 @@ The type of this owl class
 =head1 SUBROUTINES
 
 =cut
+
 #-----------------------------------------------------------------
 # init
 #-----------------------------------------------------------------

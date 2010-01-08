@@ -4,7 +4,7 @@
 #         Martin Senger <martin.senger@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: DateTime.pm,v 1.3 2009-10-02 15:54:01 ubuntu Exp $
+# $Id: DateTime.pm,v 1.4 2010-01-07 21:46:39 ubuntu Exp $
 #-----------------------------------------------------------------
 
 package SADI::Data::DateTime;
@@ -13,7 +13,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.3 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -26,9 +26,9 @@ SADI::Data::DateTime - A primitive SADI data type for dates/times
  # create a DateTime
  my $data = SADI::Data::DateTime->new (value => '1994-11-05T08:15:30-05:00');
  my $data = SADI::Data::DateTime->new ('1994-11-05T08:15:30-05:00');
- 
+
 =head1 DESCRIPTION
-	
+
 An object representing a DateTime, a SADI primitive data type.
 
 The value of this object is stored internally as a string, but upon

@@ -4,7 +4,7 @@
 #         Martin Senger <martin.senger@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: Object.pm,v 1.1 2009-08-25 14:30:49 ubuntu Exp $
+# $Id: Object.pm,v 1.2 2010-01-07 21:46:39 ubuntu Exp $
 #-----------------------------------------------------------------
 
 package SADI::Data::Object;
@@ -13,7 +13,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.1 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -25,22 +25,22 @@ SADI::Data::Object
 
  # create a sadi object with a namespace of NCBI_gi and id 545454
  my $data = SADI::Data::Object->new (namespace=>"NCBI_gi", id=>"545454");
- 
+
  # set/get an article name for this data object
  $data->name ('myObject');
  print $data->name;
- 
+
  # set/get an id for this data object
  $data->id ('myID');
  print $data->id;
- 
+
  # check if this data object is a primitive type
  print "a primitive" if $data->primitive;
  print "not a primitive" if not $data->primitive;
- 
+
  # get a formatted string representation of this data object
  print $data->toString;
- 
+
 =head1 DESCRIPTION
 
 An object representing a SADI object (usually consisting of a namespace and id)

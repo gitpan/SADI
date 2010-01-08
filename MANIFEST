@@ -74,8 +74,13 @@ NOTES
 README
 share/log4perl.properties.template
 share/sadi-services.cfg.template
+t/datatypes.xml
 t/getMolecularInteractions.rdf
 t/SADI-Base.t
+t/SADI-Config.t
+t/SADI-Datatypes.t
 t/SADI-FileStore.t
 t/SADI-OWL-SADIServiceParser.t
 t/SADI-Service-Instance.t
+t/sadi-services.cfg
+t/SADI.t

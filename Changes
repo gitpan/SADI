@@ -1,5 +1,15 @@
 Revision history for Perl extension SADI.
-
+0.99.1
+  - datatype doc had incorrect reference to a non-
+    existent module. Changed it to read
+    "sadiframework::org::examples::example::owl::AnnotatedGeneID_Record"
+  - added the ability to specify an outdir in datatypes script 
+  - added test cases for generated perl modules representing owl entities
+  - added test cases for config module
+  - fixed some typos in test cases
+  - updated some pre-existing pod to remove warnings/errors when generating
+    pod html
+  
 0.99
   - added REQUEST_URI to log_request in ServiceBase.
   - fixed some typos in perldoc

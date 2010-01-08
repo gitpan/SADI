@@ -2,13 +2,13 @@
 #
 # Generate perl modules from OWL files.
 #
-# $Id: sadi-generate-datatypes.pl,v 1.59 2009-11-23 18:40:33 ubuntu Exp $
+# $Id: sadi-generate-datatypes.pl,v 1.63 2010-01-07 18:44:20 ubuntu Exp $
 # Contact: Edward Kawas <edward.kawas+SADI@gmail.com>
 # -----------------------------------------------------------
 # some command-line options
 use Getopt::Std;
-use vars qw/ $opt_h $opt_b $opt_u $opt_d $opt_v $opt_s $opt_i $opt_F/;
-getopts('hudvsFib');
+use vars qw/ $opt_h $opt_b $opt_u $opt_d $opt_v $opt_s $opt_i $opt_F $opt_o/;
+getopts('hudvsFibo:');
 
 # usage
 if ( &check_odo() or $opt_h or @ARGV == 0 ) {
@@ -24,12 +24,12 @@ Usage: [-vdsib] owl-class-file
     -b ... option to specify the base uri for the owl document (you will be prompted)
     
     -i ... follow owl import statements
-
+    
     -v ... verbose
     -d ... debug
     -h ... help
 
-Note: This script requires that the PERL module ODO, from IBM Semantic Layered,
+Note: This script requires that the PERL module ODO, from IBM Semantic Layered
       Research Platform be installed on your workstation! ODO is available on CPAN
       as PLUTO.
 
@@ -69,6 +69,7 @@ $LOG->level('DEBUG') if $opt_d;
 sub say { print @_, "\n"; }
 
 my %imports_added;
+say "Output is going to $opt_o\n" if $opt_o;
 
 if (@ARGV) {
 	foreach my $arg (@ARGV) {
@@ -124,7 +125,7 @@ if (@ARGV) {
 		if ($opt_s) {
 			my $code = '';
 			&generate_datatypes( $SCHEMA, \$code );
-			say $code;
+			print STDOUT $code;
 		} else {
 			&generate_datatypes($SCHEMA);
 		}
@@ -202,7 +203,10 @@ sub _process_object_properties {
 			);
 		} else {
 			$generator->generate_object_property( property   => $property,
-												  force_over => $opt_F, );
+												  force_over => $opt_F,
+												  impl_outdir => $opt_o ) if $opt_o;
+            $generator->generate_object_property( property   => $property,
+                                                  force_over => $opt_F,)unless $opt_o;
 		}
 		$oProperties{$key} = $property;
 	}
@@ -251,7 +255,10 @@ sub _process_datatype_properties {
 			);
 		} else {
 			$generator->generate_datatype_property( property   => $property,
-													force_over => $opt_F, );
+													force_over => $opt_F,
+													impl_outdir => $opt_o ) if $opt_o;
+            $generator->generate_datatype_property( property   => $property,
+                                                    force_over => $opt_F, ) unless $opt_o;
 		}
 		$dProperties{$key} = $property;
 	}
@@ -402,7 +409,10 @@ sub _process_classes {
 			);
 		} else {
 			$generator->generate_class( class      => $class,
-										force_over => $opt_F, );
+										force_over => $opt_F,
+										impl_outdir => $opt_o ) if $opt_o;
+            $generator->generate_class( class      => $class,
+                                        force_over => $opt_F, ) unless $opt_o;
 		}
 	}
 }

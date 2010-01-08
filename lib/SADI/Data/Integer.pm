@@ -4,7 +4,7 @@
 #         Martin Senger <martin.senger@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: Integer.pm,v 1.2 2009-10-02 15:54:02 ubuntu Exp $
+# $Id: Integer.pm,v 1.3 2010-01-07 21:46:39 ubuntu Exp $
 #-----------------------------------------------------------------
 
 package SADI::Data::Integer;
@@ -13,7 +13,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.3 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -25,13 +25,13 @@ SADI::Data::Integer - A primitive SADI data type for integers
 
  # create a SADI Integer with initial value of -15
  my $data = SADI::Data::Integer->new (value => -15);
- 
+
  # set/get the value of this data object
  $data->value (79);
  print $data->value();
 
 =head1 DESCRIPTION
-	
+
 An object representing an Integer.
 
 =head1 AUTHORS

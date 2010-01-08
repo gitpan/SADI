@@ -4,7 +4,7 @@
 #         Martin Senger <martin.senger@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: Boolean.pm,v 1.4 2009-10-02 15:54:02 ubuntu Exp $
+# $Id: Boolean.pm,v 1.5 2010-01-07 21:44:17 ubuntu Exp $
 #-----------------------------------------------------------------
 
 package SADI::Data::Boolean;
@@ -13,7 +13,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.5 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -27,7 +27,7 @@ SADI::Data::Boolean - A primitive SADI data type for booleans
  my $data = SADI::Data::Boolean->new ( value=>'true' );
  my $data = SADI::Data::Boolean->new ('true');
  my $data = SADI::Data::Boolean->new ();
- 
+
  # change the value to false
  $data->value ('false');
 
@@ -35,7 +35,7 @@ SADI::Data::Boolean - A primitive SADI data type for booleans
  print $data->value;
 
 =head1 DESCRIPTION
-	
+
 An object representing a Boolan.
 
 =head1 AUTHORS

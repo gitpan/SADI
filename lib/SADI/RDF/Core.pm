@@ -4,7 +4,7 @@
 #         Edward Kawas
 # For copyright and disclaimer see below.
 #
-# $Id: Core.pm,v 1.13 2009-12-03 18:42:36 ubuntu Exp $
+# $Id: Core.pm,v 1.15 2010-01-07 22:00:38 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::RDF::Core;
 use strict;
@@ -30,11 +30,11 @@ use base ("SADI::Base");
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.13 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.15 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
-     SADI::RDF::Core -- A Perl package for SADI services
+SADI::RDF::Core - A Perl package for SADI services
 
 =head1 DESCRIPTION
 
@@ -291,9 +291,9 @@ sub getLiteralPropertyValues {
       subject   => the URI of the subject for which you want to retrieve statements for
       object    => the URI of the object for which you want to retrieve statements for
       predicate => the URI of the predicate for which you want to retrieve statements for
-  
+
   B<subject, object and predicate are all optional.>
-  
+
   returns
       a reference to an array of RDF::Core::Statements that match the given subject, object and predicate
 
@@ -351,9 +351,9 @@ sub getStatements {
   %args
       subject   => the URI of the subject for which you want to retrieve objects for
       predicate => the URI of the predicate for which you want to retrieve objects for
-  
+
   B<subject, object and predicate are all optional.>
-  
+
   returns
       a reference to an array of RDF::Core::Resource that match the given subject and predicate
 
@@ -392,11 +392,11 @@ sub getObjects {
 
   add an output triple to the model; the predicate of the triple
   is automatically extracted from the ServicePredicate.
-  
+
   You can pass a URI or an RDF::Core::Resource as the "value" argument.  
   The node is automatically rdf:typed as the OutputClass if you include
   the "typed_as_output" argument as true.
-  
+
   If you pass a "value" that looks like a URI, then this routine WILL ASSUME
   THAT YOU WANT IT TO BE AN OBJECT, NOT A SCALAR VALUE.  To over-ride this,
   set the boolean "force_literal" argument.  If you pass an RDF::Core::Resource
@@ -404,21 +404,20 @@ sub getObjects {
   will be extracted and added as a literal value rather than as an object.
 
   args
-     
+
      node => $URI  (the URI string, RDF::Core::Resource of the subject node or 
              a SADI::Data::OWL::Class (object generated using sadi-generate-datatypes)).
              In the event of an OWL class, all other args are ignored.
-     
+
      value => $val  (a string value)
-     
+
      predicate => $URI (required unless node isa SADI::Data::OWL::Class- the predicate to put between them.)
-     
+
      typed_as_output => boolean (if present output is rdf:typed as output class)
-     
+
      force_literal => boolean
-     
+
      label => $label (string); label for value node, only if value is a URI
-     
 
 =cut
 
@@ -559,7 +558,7 @@ sub serializeOutputModel {
   according to the SADI best-practices, the service URL should return the
   interface document if you call it with GET.  Here we auto-generate that
   document.
- 
+
   $service->getServiceInterface()
 
 =cut

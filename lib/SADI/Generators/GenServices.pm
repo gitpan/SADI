@@ -5,7 +5,7 @@
 #
 # For copyright and disclaimer see below.
 #
-# $Id: GenServices.pm,v 1.7 2009-10-02 15:54:08 ubuntu Exp $
+# $Id: GenServices.pm,v 1.8 2010-01-07 21:53:18 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Generators::GenServices;
 
@@ -25,7 +25,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.7 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.8 $ =~ /: (\d+)\.(\d+)/;
 
 #-----------------------------------------------------------------
 # A list of allowed attribute names. See SADI::Base for details.
@@ -740,8 +740,10 @@ SADI::Generators::GenServices - generator of SADI services
 =head1 SYNOPSIS
 
  use SADI::Generators::GenServices;
- 
+
 =head1 DESCRIPTION
+
+A module required for generating SADI service skeleton code.
 
 =head1 AUTHORS, COPYRIGHT, DISCLAIMER
 

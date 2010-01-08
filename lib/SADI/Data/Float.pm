@@ -4,7 +4,7 @@
 #         Martin Senger <martin.senger@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: Float.pm,v 1.2 2009-10-02 15:54:02 ubuntu Exp $
+# $Id: Float.pm,v 1.3 2010-01-07 21:46:39 ubuntu Exp $
 #-----------------------------------------------------------------
 
 package SADI::Data::Float;
@@ -13,7 +13,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.3 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -26,13 +26,13 @@ SADI::Data::Float - A primitive SADI data type for float numbers
  # create a SADI Float with initial value of -15.5
  my $data = SADI::Data::Float->new (value => -15.5);
  my $data = SADI::Data::Float->new (-15.5);
- 
+
  # later change the value of this data object
  $data->value (79);
  print $data->value();
 
 =head1 DESCRIPTION
-	
+
 An object representing a Float.
 
 =head1 AUTHORS

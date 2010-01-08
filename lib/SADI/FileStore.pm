@@ -4,7 +4,7 @@
 #
 # For copyright and disclaimer see below.
 #
-# $Id: FileStore.pm,v 1.8 2009-10-02 15:53:47 ubuntu Exp $
+# $Id: FileStore.pm,v 1.9 2010-01-07 21:52:14 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::FileStore;
 use SADI::Base;
@@ -20,7 +20,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.8 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.9 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -34,12 +34,12 @@ SADI::FileStore - A module for (add|get|delet)ing persistent data
 
  # create a new blank SADI FileStore object
  my $data = SADI::FileStore->new ();
- 
+
  # create a new primed SADI File store object
  $data = SADI::FileStore->new (
      ServiceName => "HelloWorldService",
  );
- 
+
  # get the service name
  my $name = $data->ServiceName;
  # set the service name
@@ -47,7 +47,7 @@ SADI::FileStore - A module for (add|get|delet)ing persistent data
 
  # create a unique id
  my $uid = $data->generate_uid();
- 
+
  # store a persistent file
  $data->add($uid,"my value");
 
