@@ -1,5 +1,16 @@
 Revision history for Perl extension SADI.
-0.99.1
+
+0.99.2 - another mainly documentation release
+  - updated the makefile to reflect that we need PLUTO 
+    0.23 in order to work correctly.
+  - updated the tutorials to reflect that codebase is
+    now only available on CPAN.
+  - services use header 'application/rdf+xml' rather
+    than text/xml
+  - update SADI.pm to reflect recent changes in code
+  - fix some typos in sadi-class.tt
+
+0.99.1 - mainly a documentation release
   - datatype doc had incorrect reference to a non-
     existent module. Changed it to read
     "sadiframework::org::examples::example::owl::AnnotatedGeneID_Record"

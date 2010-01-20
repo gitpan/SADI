@@ -7,7 +7,7 @@ Perl SADI is a generator of Perl based SADI
 web services (CGI based). This module
 will hopefully help all those service providers
 that have something to offer, but don't want to
-get overwhelmed by the SADIE services protocol.
+get overwhelmed by the SADI services protocol.
 
 Perl SADI takes care of all data marshalling and
 un-marshalling, web service transporting, and much

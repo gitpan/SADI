@@ -177,7 +177,7 @@ __END__
   my $class = [% obj.module_name %]->new();
 
   # get the uri for this class
-  my $uri = $property->uri;
+  my $uri = $class->uri;
 
 [% IF obj.datatype_properties -%]
   # add datatype properties 
@@ -192,7 +192,7 @@ __END__
 [% IF obj.object_properties -%]
   # add object properties 
 [% FOREACH child IN obj.object_properties -%]
-  use [% child.module_name; %]
+  use [% child.module_name; %];
   my $[% child.name %] = new [% child.module_name %]('');
   $class->add_[% child.name %]($[% child.name %]);
   # get the [% child.name %] object properties

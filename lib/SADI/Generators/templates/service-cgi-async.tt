@@ -6,7 +6,7 @@
 # It includes some hard-coded paths - they were added during the
 # generate service call.
 #
-# $Id: service-cgi-async.tt,v 1.19 2009-12-01 19:44:31 ubuntu Exp $
+# $Id: service-cgi-async.tt,v 1.20 2010-01-11 20:45:21 ubuntu Exp $
 # Contact: Edward Kawas <edward.kawas@gmail.com>
 # ---------------------------------------------------------------
 [%# A template for a sadi service.
@@ -62,7 +62,7 @@ if ($ENV{REQUEST_METHOD} eq 'GET') {
         my $core = SADI::RDF::Core->new;
         # set the Instance for $core
         $core->Signature(__PACKAGE__->get_service_signature('[% obj.ServiceName %]'));
-        print $q->header(-type=>'text/xml');
+        print $q->header(-type=>'application/rdf+xml');
         print $core->getServiceInterface();
         exit();
     } unless $q->param('poll');
@@ -80,7 +80,7 @@ if ($ENV{REQUEST_METHOD} eq 'GET') {
         # we are done
         eval {$completed = __PACKAGE__->retrieve($poll);};
         unless ($@) {
-          print $q->header(-type=>'text/xml');
+          print $q->header(-type=>'application/rdf+xml');
           print $completed;
           exit;
         }
@@ -88,7 +88,7 @@ if ($ENV{REQUEST_METHOD} eq 'GET') {
         # still waiting
         my $signature = __PACKAGE__->get_service_signature('[% obj.ServiceName %]');
         print $q->redirect(-uri=>$signature->URL . "?poll=$poll", -status=>302, -pragma=>"sadi-please-wait = $SUGGESTED_WAIT_TIME");
-        #print $q->header(-type=>'text/xml', -sadi_please_wait=>$SUGGESTED_WAIT_TIME);
+        #print $q->header(-type=>'application/rdf+xml', -sadi_please_wait=>$SUGGESTED_WAIT_TIME);
         #print __PACKAGE__->get_polling_rdf();
         exit;
     }
@@ -108,7 +108,7 @@ if ($ENV{REQUEST_METHOD} eq 'GET') {
     );
    my $q = new CGI;
    print $q->header(
-     -type=>'text/xml',
+     -type=>'application/rdf+xml',
    );
    print __PACKAGE__->get_polling_rdf();
 }

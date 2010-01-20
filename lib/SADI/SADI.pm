@@ -3,7 +3,7 @@
 # Author: Edward Kawas
 # For copyright and disclaimer see below.
 #
-# $Id: SADI.pm,v 1.24 2010-01-07 21:59:06 ubuntu Exp $
+# $Id: SADI.pm,v 1.31 2010-01-20 23:38:29 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::SADI;
 use strict 'vars';
@@ -13,7 +13,7 @@ use vars qw{$VERSION};
 
 BEGIN {
 	use vars qw{@ISA @EXPORT @EXPORT_OK};
-	$VERSION = sprintf "%d.%02d", q$Revision: 1.24 $ =~ /: (\d+)\.(\d+)/;
+	$VERSION = sprintf "%d.%02d", q$Revision: 1.31 $ =~ /: (\d+)\.(\d+)/;
 	*SADI::SADI::VERSION = *VERSION;
 }
 
@@ -24,6 +24,26 @@ __END__
 =head1 NAME
 
 SADI - !!Look Here First!! Perl extension for the automatic generation of SADI web services
+
+=head2 Upgrading From Version 0.99.1
+
+For those of you upgrading a previous SADISeS installation, you will need to
+decide if you want to remove the CGI entry scripts for your services and re-generate them.
+
+The reason for this is that the mime type header for SADI services has been changed to
+"application/rdf+xml", as per the W3C RDF spec. While this change makes your services
+more correct, it doesnt change how your services behave.
+
+The easiest way to update your services is to do the following (assuming for a second
+that your home directory is /home/ubuntu/ and that you are using a *NIX machine):
+
+To update your entry scripts, do something like:
+
+C<for i in `find /home/ubuntu/Perl-SADI/cgi -type f -print`; do perl -pi -e 's|text/xml|application/rdf\+xml|g' $i; done> 
+
+If you are on windows, try the following (assuming that your home directory is C:\Users\ubuntu\):
+
+C<for /R %i in ("C:\Users\ubuntu\Perl-SADI\cgi\*") do perl -pi -e 's|text/xml|application/rdf\+xml|g' %i>
 
 =head1 SYNOPSIS
 
@@ -434,7 +454,7 @@ Perl Moses generates Perl code. Actually, up to four pieces of the code:
 
 SADISeS allows for easier implementation of SADI services by allowing you to use automatically generated PERL modules representing OWL classes in your service implementation.
 
-The Generated perl modules that represent OWL classes have their own constructors, contain getter and setters for their datatype properties, and even have range checking for object properties. While the generator isn''t perfect, it will do the job in most cases; making your service provision much more simple.
+The Generated perl modules that represent OWL classes have their own constructors, contain getter and setters for their datatype properties, and even have range checking for object properties. While the generator isn't perfect, it will do the job in most cases; making your service provision much more simple.
 
 =cut
 
@@ -1164,7 +1184,7 @@ re-create it. Here is a whole script (for HelloSadiWorld):
 # It includes some hard-coded paths - they were added during the
 # generate service call.
 #
-# $Id: SADI.pm,v 1.24 2010-01-07 21:59:06 ubuntu Exp $
+# $Id: SADI.pm,v 1.31 2010-01-20 23:38:29 ubuntu Exp $
 # Contact: Edward Kawas &lt;edward.kawas@gmail.com&gt;
 # ---------------------------------------------------------------
 
