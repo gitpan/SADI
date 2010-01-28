@@ -133,10 +133,10 @@ SignatureURL = http://localhost/cgi-bin/CalculateLinearRegressionAutoAsync</pre>
 <p>Our business logic will be placed after the line:</p>
 <pre># do something with $input ... (sorry, can't help with that)</pre>
 <p>Before adding the business logic, we need to add some use statements! These imports are based on the OWL classes that were converted to Perl modules</p>
-<pre>use sadiframework::org::examples::regression::owl::LinearRegressionModel;
-use sadiframework::org::examples::regression::owl::slope;
-use sadiframework::org::examples::regression::owl::intercept;
-use sadiframework::org::examples::regression::owl::OutputClass;</pre>
+<pre>use sadiframework::org::examples::regression::LinearRegressionModel;
+use sadiframework::org::examples::regression::slope;
+use sadiframework::org::examples::regression::intercept;
+use sadiframework::org::examples::regression::OutputClass;</pre>
 <h4>Our business logic:</h4>
 <p>Reading the inputs:</p>
     <pre># keep the regression URI
@@ -200,18 +200,18 @@ sleep(30);</pre>
 <pre>
 # instantiate our OutputClass object
 my $outputClass =
-  new sadiframework::org::examples::regression::owl::OutputClass(
+  new sadiframework::org::examples::regression::OutputClass(
         '#regression1'
   );
 
 # instantiate a regression model
 my $regression =
-  sadiframework::org::examples::regression::owl::LinearRegressionModel
+  sadiframework::org::examples::regression::LinearRegressionModel
   ->new(
       slope =>
-        new sadiframework::org::examples::regression::owl::slope($slope),
+        new sadiframework::org::examples::regression::slope($slope),
       intercept =>
-        new sadiframework::org::examples::regression::owl::intercept($intercept),
+        new sadiframework::org::examples::regression::intercept($intercept),
   );
 
 # add the regression model to our output class

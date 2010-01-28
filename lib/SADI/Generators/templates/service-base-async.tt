@@ -137,6 +137,12 @@ sub [% obj.ServiceName %] {
 	    $core->Prepare($data) 
 	      or $self->throw("Error parsing the input RDF. Couldn't create a model!");
     };
+    
+    # save the input URIs for polling RDF
+    {   my @URIS;
+        push @URIS, $_->getURI foreach ( $core->getInputNodes() );
+        $ENV{SADI_INPUT_URIS} =  join("\t", @URIS);
+    }
     # error in creating parser, or parsing input
     if ($@) {
 		$LOG->logdie ($@) if $in_testing_mode;
@@ -228,11 +234,11 @@ sub get_polling_rdf {
                           $Bin, 'SADI', 'Generators', 'templates', 'async-polling-rdf.tt'
                       )
     );
-
+    my @URIS = split("\t", $ENV{SADI_INPUT_URIS});
     $tt->process(
                   $input,
                   {
-                     inClass       => $signature->InputClass,
+                     inputURIs     => \@URIS,
                      outClass      => $signature->OutputClass, 
                      url           => $signature->URL . '?poll=' . $ENV{SADI_UID},
                   },

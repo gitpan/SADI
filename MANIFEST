@@ -76,6 +76,7 @@ share/log4perl.properties.template
 share/sadi-services.cfg.template
 t/datatypes.xml
 t/getMolecularInteractions.rdf
+t/inheritance-bug.owl
 t/SADI-Base.t
 t/SADI-Config.t
 t/SADI-Datatypes.t

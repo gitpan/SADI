@@ -1,5 +1,34 @@
 Revision history for Perl extension SADI.
 
+0.99.3 PLEASE READ perldoc for SADI::SADI for upgrade instructions!
+    * update to the entry scripts. <> changed to
+      <stdin> because perl v.5.10 doesnt seem
+      to want to do <>.
+    * added README files to the directories
+      generated using sadi-install.pl script
+    * updated the synopsis for our generated
+      modules that represent owl entities.
+    * .owl is stripped from package names for
+      generated entities.
+    * RDF-Core uses a simple counter for bnodes.
+      When we generate RDF, this resulted in incorrect
+      RDF/XML. Fixed.
+    * Asynchronous services produced incorrect polling XML.
+    * updates to the documentation were made to reflect
+      recent code changes.
+    * Async services HTTP status changed from 302 to 202
+      as per SADI publication
+    * sadi-testing-service can now poll services automatically
+      if told to do so.
+    * changed the asynchronous POST response header so that
+      sadi-please-wait is set and HTTP status is 202.
+    * added the ability to automatically poll services with
+      sadi-testing-service. 
+    * fixed bug in sadi-generate-datatypes.pl where base_uri
+      wasn't being set properly.
+    * bug fix: sometimes perl owl classes contained
+      the same restrictions twice in a module. 
+
 0.99.2 - another mainly documentation release
   - updated the makefile to reflect that we need PLUTO 
     0.23 in order to work correctly.

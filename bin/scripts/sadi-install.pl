@@ -2,7 +2,7 @@
 #
 # Prepare the stage...
 #
-# $Id: sadi-install.pl,v 1.4 2009-11-27 16:23:32 ubuntu Exp $
+# $Id: sadi-install.pl,v 1.5 2010-01-21 15:57:01 ubuntu Exp $
 # Contact: Edward Kawas <edward.kawas+sadi@gmail.com>
 # -----------------------------------------------------------
 
@@ -189,6 +189,9 @@ eval {
 		mkdir($dir)
 		  || die( "Error creating cgi scripts directory '" . $dir . "':\n$!" );
 	}
+	open (FHO,">$sadi_home/cgi/README") 
+	   and print FHO 'This directory contains entry scripts to your generated SADI services.';
+    close(FHO);
 };
 say $@ ? $@ : "Created install directory '$sadi_home/cgi'.";
 
@@ -203,6 +206,9 @@ eval {
 		  || die(
 				"Error creating installation directory directory '" . $dir . "':\n$!" );
 	}
+	open (FHO,">$samples_home/README") 
+       and print FHO 'This directory is for resources that your SADI service utilizes.';
+    close(FHO);
 };
 say $@ ? $@ : "Created sample-resources directory '$samples_home'.";
 
@@ -217,6 +223,9 @@ eval {
 		mkdir($dir)
 		  || die( "Error creating service definitions directory '" . $dir . "':\n$!" );
 	}
+	open (FHO,">$sadi_home/definitions/README") 
+       and print FHO 'This directory contains the definitions for your SADI services.';
+    close(FHO);
 };
 say $@ ? $@ : "Created service defintions directory '$sadi_home/definitions'.";
 
@@ -232,6 +241,9 @@ eval {
           || die( "Error creating service async directory '" . $dir . "':\n$!" );
     }
     chmod 0777, $async_dir;
+    open (FHO,">$async_dir/README") 
+       and print FHO 'This directory contains the temporary files needed to run asynchronous SADI services.';
+    close(FHO);
 };
 say $@ ? $@ : "Created service async directory '$sadi_home/async'.";
 
@@ -276,6 +288,35 @@ my $generated_dir = $SADICFG::GENERATORS_OUTDIR
 my $services_dir = $SADICFG::GENERATORS_IMPL_OUTDIR
   || "$sadi_home/services";
 
+eval {
+    my ( $v, $d, $f ) = File::Spec->splitpath( $generated_dir );
+    my $dir = File::Spec->catdir($v);
+    foreach my $part ( File::Spec->splitdir( ( $d . $f ) ) ) {
+        $dir = File::Spec->catdir( $dir, $part );
+        next if -d $dir or -e $dir;
+        mkdir($dir)
+          || die( "Error creating generated_dir directory '" . $dir . "':\n$!" );
+    }
+    open (FHO,">$generated_dir/README") 
+       and print FHO 'This directory will contain any generated OWL2Perl modules or base SADI service modules.';
+    close(FHO);
+};
+say $@ ? $@ : "Created service defintions directory '$generated_dir'.";
+
+eval {
+    my ( $v, $d, $f ) = File::Spec->splitpath( $services_dir );
+    my $dir = File::Spec->catdir($v);
+    foreach my $part ( File::Spec->splitdir( ( $d . $f ) ) ) {
+        $dir = File::Spec->catdir( $dir, $part );
+        next if -d $dir or -e $dir;
+        mkdir($dir)
+          || die( "Error creating service implementation directory '" . $dir . "':\n$!" );
+    }
+    open (FHO,">$services_dir/README") 
+       and print FHO 'This directory contains your SADI service implementation modules.';
+    close(FHO);
+};
+say $@ ? $@ : "Created service implementation directory '$services_dir'.";
 
 # configuration file (will be found and used, or created)
 my $config_file =

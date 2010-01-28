@@ -3,7 +3,7 @@
 # Author: Edward Kawas <edward.kawas@gmail.com>,
 # For copyright and disclaimer see below.
 #
-# $Id: Class.pm,v 1.5 2009-12-18 19:49:15 ubuntu Exp $
+# $Id: Class.pm,v 1.7 2010-01-21 17:48:56 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Data::OWL::Class;
 use base ("SADI::Base");
@@ -14,7 +14,7 @@ use RDF::Core::Statement;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.5 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.7 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -86,8 +86,7 @@ Details are in L<SADI::Base>. Here just a list of them:
 		},
 		statements => { type => 'RDF::Core::Statement', is_array => 1 },
 		# used internally / set during _get_statements
-		subject => => { type => 'RDF::Core::Resource' },
-		
+		subject => => { type => 'RDF::Core::Resource' },		
 	);
 
 	sub _accessible {

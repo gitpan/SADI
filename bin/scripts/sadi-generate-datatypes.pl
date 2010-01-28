@@ -2,7 +2,7 @@
 #
 # Generate perl modules from OWL files.
 #
-# $Id: sadi-generate-datatypes.pl,v 1.63 2010-01-07 18:44:20 ubuntu Exp $
+# $Id: sadi-generate-datatypes.pl,v 1.65 2010-01-27 19:58:57 ubuntu Exp $
 # Contact: Edward Kawas <edward.kawas+SADI@gmail.com>
 # -----------------------------------------------------------
 # some command-line options
@@ -14,8 +14,8 @@ getopts('hudvsFibo:');
 if ( &check_odo() or $opt_h or @ARGV == 0 ) {
 	print STDOUT <<'END_OF_USAGE';
 Generate perl modules from OWL files.
-Usage: [-vdsib] owl-class-file
-       [-vdsi] -u owl-class-url
+Usage: [-vdsib] [-o outdir] owl-class-file
+       [-vdsi] [-o outdir] -u owl-class-url
 
     -u ... owl is from url
     -s ... show generated code on STDOUT
@@ -103,7 +103,7 @@ if (@ARGV) {
                 $tmp =~ s/#*$//gi;
                 $base_uri = $tmp;
 			}
-			my ( $statements, $imports ) = ODO::Parser::XML->parse_file($arg, $base_uri);
+			my ( $statements, $imports ) = ODO::Parser::XML->parse_file($arg, base_uri => $base_uri);
 			$GRAPH_schema->add($statements);
 			if ($opt_i) {
 				foreach my $i (@$imports) {

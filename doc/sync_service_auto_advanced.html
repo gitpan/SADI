@@ -152,8 +152,8 @@ use LWP::Simple qw(!head);
 use XML::LibXML;
 
 # our generated owl stuff
-use sadiframework::org::examples::uniprot2go::owl::AnnotatedUniProtRecord;
-use sadiframework::org::ontologies::predicates::owl::hasGOTerm;
+use sadiframework::org::examples::uniprot2go::AnnotatedUniProtRecord;
+use sadiframework::org::ontologies::predicates::hasGOTerm;
 use purl::oclc::org::SADI::LSRN::GO_Record;
 </pre>
 <p>Reading the inputs:</p>
@@ -175,7 +175,7 @@ my $xpc    = XML::LibXML::XPathContext->new();
 my $nodes  = $xpc->findnodes( $xpath, $doc->documentElement );
 
 # before iterating over the nodes, let's create our AnnotatedUniProt_Record
-my $record = new sadiframework::org::examples::uniprot2go::owl::AnnotatedUniProtRecord($input->getURI);
+my $record = new sadiframework::org::examples::uniprot2go::AnnotatedUniProtRecord($input->getURI);
 
 # now iterate over the found nodes
 foreach my $context ( $nodes->get_nodelist ) {

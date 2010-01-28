@@ -4,7 +4,7 @@
 #         Martin Senger <martin.senger@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: Base.pm,v 1.23 2010-01-07 21:42:46 ubuntu Exp $
+# $Id: Base.pm,v 1.24 2010-01-21 17:10:38 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Base;
 use strict;
@@ -32,8 +32,8 @@ use overload q("")    => "as_string";
 BEGIN {
 	@ISA      = qw( Exporter );
 	@EXPORT   = qw( $LOG );
-	$VERSION  = sprintf "%d.%02d", q$Revision: 1.23 $ =~ /: (\d+)\.(\d+)/;
-	$Revision = '$Id: Base.pm,v 1.23 2010-01-07 21:42:46 ubuntu Exp $';
+	$VERSION  = sprintf "%d.%02d", q$Revision: 1.24 $ =~ /: (\d+)\.(\d+)/;
+	$Revision = '$Id: Base.pm,v 1.24 2010-01-21 17:10:38 ubuntu Exp $';
 
 	# initiate error handling
 	require Carp;
@@ -202,6 +202,8 @@ sub uri2package {
 		  . $lsid->namespace . '#'
 		  . $lsid->object;
 	}
+	# strip off any '.owl' bits from the URI
+	$uri =~ s/\.owl//gi;
 	my $u1 = URI->new($uri);
 
 	# the domain from the uri

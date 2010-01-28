@@ -44,6 +44,7 @@ use SADI::Base;
 #    sadi-generate-services -B [% base.ServiceName %]
 #  then comment out the whole option above, and uncomment
 #  the following line (and make sure that Perl can find it):
+[% opt2 %]    use SADI::Generators::GenServices;
 [% opt2 %]use [% module_name %];
 
 # (this to stay here with any of the options above)

@@ -14,7 +14,7 @@ BEGIN {
 	my $cmd = $Bin;
 	$cmd .= "/t" unless $cmd =~ /t$/;
 	$cmd =
-"$^X $cmd/../bin/scripts/sadi-generate-datatypes.pl -o $outdir $cmd/datatypes.xml";
+"$^X $cmd/../bin/scripts/sadi-generate-datatypes.pl -o $outdir $cmd/datatypes.xml $cmd/inheritance-bug.owl";
 	diag(
 "\nTo run this test, we need to generate perl modules!\nThis is done via the following command:\n$cmd"
 	);
@@ -34,19 +34,22 @@ END {
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 use lib "$outdir";
-use_ok('sadiframework::org::examples::example::owl::AnnotatedGeneID_Record');
+use_ok('sadiframework::org::examples::example::AnnotatedGeneID_Record');
 
 # check that the properties can be used
 my @properties = qw/ontology::dumontierlab::com::hasSymbol
-  sadiframework::org::ontologies::predicates::owl::hasDescription
-  sadiframework::org::ontologies::predicates::owl::hasProteinName
-  sadiframework::org::ontologies::predicates::owl::hasName
+  sadiframework::org::ontologies::predicates::hasDescription
+  sadiframework::org::ontologies::predicates::hasProteinName
+  sadiframework::org::ontologies::predicates::hasName
+  purl::oclc::org::SADI::LSRN::KEGG_COMPOUND_Record
+  sadiframework::org::ontologies::service_objects::hasCHEBIEntry
+  sadiframework::org::ontologies::chebiservice::getCHEBIEntryFromKEGGCompound_Output
   /;
 use_ok($_) foreach (@properties);
 
 # check the class default methods
 my $class =
-  sadiframework::org::examples::example::owl::AnnotatedGeneID_Record->new(
+  sadiframework::org::examples::example::AnnotatedGeneID_Record->new(
 																		'#foo');
 isa_ok( $class, 'SADI::Data::OWL::Class' );
 is( $class->uri,   "#foo", "check uri - set in constructor" );
@@ -88,12 +91,12 @@ is(
 
 # check hasDescription
 $class->hasDescription(
-		   sadiframework::org::ontologies::predicates::owl::hasDescription->new(
+		   sadiframework::org::ontologies::predicates::hasDescription->new(
 															 'some description')
 );
 is( scalar( @{ $class->hasDescription() } ), 1, "check hasDescription" );
 $class->add_hasDescription(
-		   sadiframework::org::ontologies::predicates::owl::hasDescription->new(
+		   sadiframework::org::ontologies::predicates::hasDescription->new(
 														   'some description 2')
 );
 is( scalar( @{ $class->hasDescription() } ), 2, "check hasDescription adder" );
@@ -105,9 +108,9 @@ is( @{ $class->hasDescription() }[1]->value,
 	"check hasDescription getter" );
 is( @{ $class->hasDescription() }[2], undef, "check hasDescription getter" );
 isa_ok( @{ $class->hasDescription() }[0],
-		'sadiframework::org::ontologies::predicates::owl::hasDescription' );
+		'sadiframework::org::ontologies::predicates::hasDescription' );
 isa_ok( @{ $class->hasDescription() }[1],
-		'sadiframework::org::ontologies::predicates::owl::hasDescription' );
+		'sadiframework::org::ontologies::predicates::hasDescription' );
 is(
 	@{ $class->hasDescription() }[0]->uri,
 	'http://sadiframework.org/ontologies/predicates.owl#hasDescription',
@@ -121,12 +124,12 @@ is(
 
 # check hasProteinName
 $class->hasProteinName(
-		   sadiframework::org::ontologies::predicates::owl::hasProteinName->new(
+		   sadiframework::org::ontologies::predicates::hasProteinName->new(
 															'some protein name')
 );
 is( scalar( @{ $class->hasProteinName() } ), 1, "check hasProteinName" );
 $class->add_hasProteinName(
-		   sadiframework::org::ontologies::predicates::owl::hasProteinName->new(
+		   sadiframework::org::ontologies::predicates::hasProteinName->new(
 														  'some protein name 2')
 );
 is( scalar( @{ $class->hasProteinName() } ), 2, "check hasProteinName adder" );
@@ -138,9 +141,9 @@ is( @{ $class->hasProteinName() }[1]->value,
 	"check hasProteinName getter" );
 is( @{ $class->hasProteinName() }[2], undef, "check hasProteinName getter" );
 isa_ok( @{ $class->hasProteinName() }[0],
-		'sadiframework::org::ontologies::predicates::owl::hasProteinName' );
+		'sadiframework::org::ontologies::predicates::hasProteinName' );
 isa_ok( @{ $class->hasProteinName() }[1],
-		'sadiframework::org::ontologies::predicates::owl::hasProteinName' );
+		'sadiframework::org::ontologies::predicates::hasProteinName' );
 is(
 	@{ $class->hasProteinName() }[0]->uri,
 	'http://sadiframework.org/ontologies/predicates.owl#hasProteinName',
@@ -154,11 +157,11 @@ is(
 
 # check hasName
 $class->hasName(
-	  sadiframework::org::ontologies::predicates::owl::hasName->new('some name')
+	  sadiframework::org::ontologies::predicates::hasName->new('some name')
 );
 is( scalar( @{ $class->hasName() } ), 1, "check hasName" );
 $class->add_hasName(
-				  sadiframework::org::ontologies::predicates::owl::hasName->new(
+				  sadiframework::org::ontologies::predicates::hasName->new(
 																  'some name 2')
 );
 is( scalar( @{ $class->hasName() } ), 2,             "check hasName adder" );
@@ -166,9 +169,9 @@ is( @{ $class->hasName() }[0]->value, 'some name',   "check hasName getter" );
 is( @{ $class->hasName() }[1]->value, 'some name 2', "check hasName getter" );
 is( @{ $class->hasName() }[2],        undef,         "check hasName getter" );
 isa_ok( @{ $class->hasName() }[0],
-		'sadiframework::org::ontologies::predicates::owl::hasName' );
+		'sadiframework::org::ontologies::predicates::hasName' );
 isa_ok( @{ $class->hasName() }[1],
-		'sadiframework::org::ontologies::predicates::owl::hasName' );
+		'sadiframework::org::ontologies::predicates::hasName' );
 is( @{ $class->hasName() }[0]->uri,
 	'http://sadiframework.org/ontologies/predicates.owl#hasName',
 	"check type of value in hasName slot" );

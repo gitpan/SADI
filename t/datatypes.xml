@@ -13,6 +13,9 @@
   <owl:DatatypeProperty rdf:about="http://sadiframework.org/ontologies/predicates.owl#hasProteinName"/>
   <owl:DatatypeProperty rdf:about="http://sadiframework.org/ontologies/predicates.owl#hasName"/>
   
+  <!-- in lieu of importing the whole ontology -->
+  <owl:Class rdf:about="http://purl.oclc.org/SADI/LSRN/GeneID_Record"/>
+  
   <owl:Class rdf:ID="AnnotatedGeneID_Record">
     <rdfs:subClassOf rdf:resource="http://purl.oclc.org/SADI/LSRN/GeneID_Record"/>
     <rdfs:subClassOf>

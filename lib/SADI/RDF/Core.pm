@@ -4,7 +4,7 @@
 #         Edward Kawas
 # For copyright and disclaimer see below.
 #
-# $Id: Core.pm,v 1.15 2010-01-07 22:00:38 ubuntu Exp $
+# $Id: Core.pm,v 1.16 2010-01-21 17:11:04 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::RDF::Core;
 use strict;
@@ -30,7 +30,7 @@ use base ("SADI::Base");
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.15 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.16 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -223,7 +223,7 @@ sub getInputNodes {
 	  RDF::Core::Resource->new("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
 	my $inputtype = RDF::Core::Resource->new($predicate);
 
-#  we need the input types to be "Input" because a client can honestly send us a more complex type that inherits and it wpont be understood without a reasoner
+#  we need the input types to be "Input" because a client can honestly send us a more complex type that inherits and it wont be understood without a reasoner
 
 	my $yesno = $model->existsStmt( undef, $type, $inputtype );
 	return () unless $yesno;

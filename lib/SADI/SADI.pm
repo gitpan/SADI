@@ -3,7 +3,7 @@
 # Author: Edward Kawas
 # For copyright and disclaimer see below.
 #
-# $Id: SADI.pm,v 1.31 2010-01-20 23:38:29 ubuntu Exp $
+# $Id: SADI.pm,v 1.33 2010-01-21 19:20:11 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::SADI;
 use strict 'vars';
@@ -13,7 +13,7 @@ use vars qw{$VERSION};
 
 BEGIN {
 	use vars qw{@ISA @EXPORT @EXPORT_OK};
-	$VERSION = sprintf "%d.%02d", q$Revision: 1.31 $ =~ /: (\d+)\.(\d+)/;
+	$VERSION = sprintf "%d.%02d", q$Revision: 1.33 $ =~ /: (\d+)\.(\d+)/;
 	*SADI::SADI::VERSION = *VERSION;
 }
 
@@ -44,6 +44,26 @@ C<for i in `find /home/ubuntu/Perl-SADI/cgi -type f -print`; do perl -pi -e 's|t
 If you are on windows, try the following (assuming that your home directory is C:\Users\ubuntu\):
 
 C<for /R %i in ("C:\Users\ubuntu\Perl-SADI\cgi\*") do perl -pi -e 's|text/xml|application/rdf\+xml|g' %i>
+
+=head2 Upgrading From Version 0.99.2
+
+For those of you upgrading a previous SADISeS installation and using OWL2Perl modules, you will need to regenerate your datatypes.
+
+After careful consideration, it was determined that we could clean up the package names for generated owl entities.
+
+The easiest way to update your services is to do the following (assuming for a second
+that your home directory is /home/ubuntu/ and that you are using a *NIX machine):
+
+To update your implementation files, do something like:
+
+C<for i in `find /home/ubuntu/Perl-SADI/services/Service -type f -print`; do perl -pi -e 's|::owl::|::|g' $i; done> 
+
+If you are on windows, try the following (assuming that your home directory is C:\Users\ubuntu\):
+
+C<for /R %i in ("C:\Users\ubuntu\Perl-SADI\cgi\*") do perl -pi -e 's|::owl::|::|g' %i>
+
+Additionally, for those of you that pre-generate your asynchronous service base file (not default operation), you will need to re-generate your service basis.
+For each service that is affected, do a C<sadi-generate-service -B your_service_name>. 
 
 =head1 SYNOPSIS
 
@@ -1184,7 +1204,7 @@ re-create it. Here is a whole script (for HelloSadiWorld):
 # It includes some hard-coded paths - they were added during the
 # generate service call.
 #
-# $Id: SADI.pm,v 1.31 2010-01-20 23:38:29 ubuntu Exp $
+# $Id: SADI.pm,v 1.33 2010-01-21 19:20:11 ubuntu Exp $
 # Contact: Edward Kawas &lt;edward.kawas@gmail.com&gt;
 # ---------------------------------------------------------------
 
