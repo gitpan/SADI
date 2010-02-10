@@ -107,7 +107,8 @@ sub _get_statements {
     # set the subject so that this sub graph can be linked to other graphs
     $self->subject($subject);
     my $add_type_statement = undef;
-        
+    $add_type_statement = 1 if defined $self->value and $self->value ne '';
+
     # add a label if one is specified
     if (defined $self->label()) {
     	$self->add_statements(
@@ -156,8 +157,14 @@ sub _get_statements {
 [% END -%]
     # add parent statements too
 [% FOREACH child IN obj.module_parent -%]
-    eval {$self->add_statements($self->[%- child -%]::_get_statements());};
-[% END %];
+    eval {
+    	my @statements = @{$self->[%- child -%]::_get_statements()};
+    	if (scalar (@statements) > 0) {
+    		$self->add_statements(@statements);
+    		$add_type_statement ||= undef;
+    	}
+    };
+[% END %]
 
     # add the type
     $self->add_statements(
@@ -166,7 +173,7 @@ sub _get_statements {
             $subject->new( SADI::RDF::Predicates::RDF->type ),
             new RDF::Core::Resource( $self->type )
         )
-    ) if $add_type_statement or scalar (@{ $self->statements }) > 0;
+    ) if $add_type_statement; # or scalar (@{ $self->statements }) > 0;
     
     return $self->statements;
 }

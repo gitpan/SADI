@@ -1,5 +1,11 @@
 Revision history for Perl extension SADI.
 
+0.99.4
+    * bug fix: updated get_statements so that typed bnodes with
+      no other triples get added to the output RDF model.
+    * removed the extra declaration from the polling rdf
+    
+
 0.99.3 PLEASE READ perldoc for SADI::SADI for upgrade instructions!
     * update to the entry scripts. <> changed to
       <stdin> because perl v.5.10 doesnt seem
