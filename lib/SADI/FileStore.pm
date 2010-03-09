@@ -4,7 +4,7 @@
 #
 # For copyright and disclaimer see below.
 #
-# $Id: FileStore.pm,v 1.9 2010-01-07 21:52:14 ubuntu Exp $
+# $Id: FileStore.pm,v 1.11 2010-03-08 19:27:00 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::FileStore;
 use SADI::Base;
@@ -20,7 +20,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.9 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.11 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -352,13 +352,13 @@ sub _clean_servicename {
 
 sub _is_dir_empty {
 	my ( $self, $path ) = @_;
-	opendir DIR, $path;
-	while ( my $entry = readdir DIR ) {
+	opendir (my $dfh, $path);
+	while ( my $entry = readdir ($dfh) ) {
 		next if ( $entry =~ /^\.\.?$/ );
-		closedir DIR;
+		closedir ($dfh);
 		return 0;
 	}
-	closedir DIR;
+	closedir ($dfh);
 	return 1;
 }
 

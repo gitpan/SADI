@@ -119,7 +119,13 @@ use SADI::RDF::Predicates::RDFS;
 #                  will be extracted and added as a literal value rather than as an object.
 #                
 #                  args
-#                     node => $URI  (the URI string or RDF::Core::Resource of the subject node)
+#                     node => $URI  (the URI string or RDF::Core::Resource of the subject node
+#                             or a subclass of SADI::Data::OWL::Class )
+#                       NOTE:
+#                          if $URI->isa(SADI::Data::OWL::Class) created via
+#                          sadi-generate-datatypes script then all RDF statements
+#                          for this resource are added to our model and all 
+#                          other arguments are ignored!
 #                     value => $val  (a string value)
 #                     predicate => $URI (required - the predicate to put between them.  
 #                                        unless your $URI->isa(SADI::Data::OWL::Class))

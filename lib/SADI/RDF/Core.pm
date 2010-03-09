@@ -4,7 +4,7 @@
 #         Edward Kawas
 # For copyright and disclaimer see below.
 #
-# $Id: Core.pm,v 1.16 2010-01-21 17:11:04 ubuntu Exp $
+# $Id: Core.pm,v 1.19 2010-03-09 17:36:14 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::RDF::Core;
 use strict;
@@ -12,6 +12,7 @@ use strict;
 use Carp;
 
 use Template;
+ 
 use FindBin qw( $Bin );
 use lib $Bin;
 use File::Spec;
@@ -30,7 +31,7 @@ use base ("SADI::Base");
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.16 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.19 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -579,10 +580,14 @@ sub getServiceInterface {
 	my $authoritative = $self->Signature->Authoritative();
 	my $authority     = $self->Signature->Authority() ;
 	my $sigURL        = $self->Signature->SignatureURL() || "";
+	my @tests         = $self->Signature->UnitTest || ();
 
 	# generate from template
 	my $sadi_interface_signature= '';
-	my $tt = Template->new( ABSOLUTE => 1, TRIM => 1 );
+	my $tt = Template->new( 
+	   ABSOLUTE => 1, 
+	   TRIM => 1, 
+	);
 	my $input = File::Spec->rel2abs(
 					  SADI::Utils->find_file(
 						  $Bin, 'SADI', 'Generators', 'templates', 'service-signature.tt'
@@ -605,6 +610,7 @@ sub getServiceInterface {
 					 authoritative => $authoritative,
 					 authority     => $authority,
 					 sigURL        => $sigURL,
+					 tests         => @tests,
 				  },
 				  \$sadi_interface_signature
 	) || $LOG->logdie( $tt->error() );

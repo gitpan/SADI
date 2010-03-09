@@ -3,18 +3,19 @@
 # Author: Edward Kawas <edward.kawas@gmail.com>,
 # For copyright and disclaimer see below.
 #
-# $Id: Class.pm,v 1.9 2010-02-01 15:03:58 ubuntu Exp $
+# $Id: Class.pm,v 1.11 2010-02-10 23:19:11 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Data::OWL::Class;
 use base ("SADI::Base");
 use strict;
+use URI;
 
 # imports
 use RDF::Core::Statement;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.9 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.11 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -73,6 +74,8 @@ Details are in L<SADI::Base>. Here just a list of them:
 			post => sub {
 				my $self = shift;
 				$self->{uri} = $self->value;
+				# set the id portion of the ID
+                $self->ID($self->{value});
 			  }
 		},
 		# value and uri are synonyms here
@@ -81,7 +84,24 @@ Details are in L<SADI::Base>. Here just a list of them:
 			post => sub {
 				my $self = shift;
 				$self->{value} = $self->uri;
+				# set the id portion of the ID
+				$self->ID($self->{value});
 			  }
+		},
+		ID => {
+			type => SADI::Base->STRING,
+            post => sub {
+                my $self = shift;
+                my $id = undef;
+                # id is either text after leftmost :
+                $id = $1 if ($self->{ID} =~ m|.*/\w+:(.*)$|gi);
+                # or item after #
+                $id = $1 if not defined $id and ($self->{ID} =~ m|#(.*)$|gi);
+                # or item after /
+                $id = $1 if not defined $id and ($self->{ID} =~ m|.*/(.*)$|gi);
+                $id = $1 if not defined $id and ($self->{ID} =~ m|^\s*([[:alnum:]]+)\s*$|gi);
+                $self->{ID} = $id;
+              }
 		},
 		statements => { type => 'RDF::Core::Statement', is_array => 1 },
 		# used internally / set during _get_statements

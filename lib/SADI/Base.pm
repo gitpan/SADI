@@ -4,7 +4,7 @@
 #         Martin Senger <martin.senger@gmail.com>
 # For copyright and disclaimer see below.
 #
-# $Id: Base.pm,v 1.24 2010-01-21 17:10:38 ubuntu Exp $
+# $Id: Base.pm,v 1.28 2010-02-11 00:02:51 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Base;
 use strict;
@@ -32,8 +32,8 @@ use overload q("")    => "as_string";
 BEGIN {
 	@ISA      = qw( Exporter );
 	@EXPORT   = qw( $LOG );
-	$VERSION  = sprintf "%d.%02d", q$Revision: 1.24 $ =~ /: (\d+)\.(\d+)/;
-	$Revision = '$Id: Base.pm,v 1.24 2010-01-21 17:10:38 ubuntu Exp $';
+	$VERSION  = sprintf "%d.%02d", q$Revision: 1.28 $ =~ /: (\d+)\.(\d+)/;
+	$Revision = '$Id: Base.pm,v 1.28 2010-02-11 00:02:51 ubuntu Exp $';
 
 	# initiate error handling
 	require Carp;
@@ -224,6 +224,9 @@ sub uri2package {
 
 	# remove leading /
 	$path =~ s/^\///g;
+	
+	# sub fragment with : to _ 
+	$path =~ s/:/_/g;
 
 	# convert / and . to ::
 	$path =~ s/\/|\./::/g;
@@ -963,9 +966,9 @@ Without any parameter, it stringifies the caller object
 #   
 #   Example:
 #    uri given: 
-#      http://sadiframework.org/examples/regression.owl#DatedValue   
+#      http://sadiframework.org/examples/regression#DatedValue   
 #    package returned:
-#      sadiframework::org::examples::regression::owl
+#      sadiframework::org::examples::regression
 #
 #-----------------------------------------------------------------
 

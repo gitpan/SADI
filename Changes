@@ -1,5 +1,35 @@
 Revision history for Perl extension SADI.
 
+0.99.5
+    * tweaked the synopsis in SADI::SADI (thanks to Mark)
+    * updated the doc in template for async impl service
+    * Bug fix: URIs with : in the name caused syntax errors
+    * added some verbose statements to generate-datatypes
+    * added xml section to the config file to select
+      the SAX parser in generate-datatypes
+    * added the ability for generate datatypes to
+      select an XML parser.
+    * updated FileStore's reading/closing of directory
+      handles.
+    * sadi-install script adds new unittest directory to
+      users folder.
+    * added new unittest section to sadi-services.cfg that
+      points to the unit test directory
+    * created SADI::Service::UnitTest module to encapsulate
+      unit test data for sadi services. Added to 
+      SADI::Service::Instance get/set for UnitTests.
+    * added the ability for SADIServiceParser to parse unit
+      test information
+    * added XML filter to the template for service signatures
+    * added unit test data to the template for service signatures
+    * made messages from GenServices.pm DEBUG and not INFO to
+      shut it up a bit ...
+    * added a -T option to generate service script to generate
+      a unit test for a sadi service
+    * created a new tutorial for creating unit tests
+    * updated the service tutorials (example input/output was
+      specified incorrectly, i.e. not as lsrn.org identifiers)
+
 0.99.4
     * bug fix: updated get_statements so that typed bnodes with
       no other triples get added to the output RDF model.

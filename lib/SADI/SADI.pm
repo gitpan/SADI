@@ -3,7 +3,7 @@
 # Author: Edward Kawas
 # For copyright and disclaimer see below.
 #
-# $Id: SADI.pm,v 1.33 2010-01-21 19:20:11 ubuntu Exp $
+# $Id: SADI.pm,v 1.36 2010-03-09 18:04:43 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::SADI;
 use strict 'vars';
@@ -13,7 +13,7 @@ use vars qw{$VERSION};
 
 BEGIN {
 	use vars qw{@ISA @EXPORT @EXPORT_OK};
-	$VERSION = sprintf "%d.%02d", q$Revision: 1.33 $ =~ /: (\d+)\.(\d+)/;
+	$VERSION = sprintf "%d.%02d", q$Revision: 1.36 $ =~ /: (\d+)\.(\d+)/;
 	*SADI::SADI::VERSION = *VERSION;
 }
 
@@ -25,25 +25,11 @@ __END__
 
 SADI - !!Look Here First!! Perl extension for the automatic generation of SADI web services
 
-=head2 Upgrading From Version 0.99.1
+=head2 Upgrading From Version 0.99.4
 
-For those of you upgrading a previous SADISeS installation, you will need to
-decide if you want to remove the CGI entry scripts for your services and re-generate them.
+Version 0.99.5 contains some neat new features and bug fixes! One of the added features is the ability to add unit test for your service.
 
-The reason for this is that the mime type header for SADI services has been changed to
-"application/rdf+xml", as per the W3C RDF spec. While this change makes your services
-more correct, it doesnt change how your services behave.
-
-The easiest way to update your services is to do the following (assuming for a second
-that your home directory is /home/ubuntu/ and that you are using a *NIX machine):
-
-To update your entry scripts, do something like:
-
-C<for i in `find /home/ubuntu/Perl-SADI/cgi -type f -print`; do perl -pi -e 's|text/xml|application/rdf\+xml|g' $i; done> 
-
-If you are on windows, try the following (assuming that your home directory is C:\Users\ubuntu\):
-
-C<for /R %i in ("C:\Users\ubuntu\Perl-SADI\cgi\*") do perl -pi -e 's|text/xml|application/rdf\+xml|g' %i>
+All that is needed to upgrade to 0.99.5 is for you to re-run the C<sadi-install.pl> script.  
 
 =head2 Upgrading From Version 0.99.2
 
@@ -65,23 +51,55 @@ C<for /R %i in ("C:\Users\ubuntu\Perl-SADI\cgi\*") do perl -pi -e 's|::owl::|::|
 Additionally, for those of you that pre-generate your asynchronous service base file (not default operation), you will need to re-generate your service basis.
 For each service that is affected, do a C<sadi-generate-service -B your_service_name>. 
 
+=head2 Upgrading From Version 0.99.1
+
+For those of you upgrading a previous SADISeS installation, you will need to
+decide if you want to remove the CGI entry scripts for your services and re-generate them.
+
+The reason for this is that the mime type header for SADI services has been changed to
+"application/rdf+xml", as per the W3C RDF spec. While this change makes your services
+more correct, it doesnt change how your services behave.
+
+The easiest way to update your services is to do the following (assuming for a second
+that your home directory is /home/ubuntu/ and that you are using a *NIX machine):
+
+To update your entry scripts, do something like:
+
+C<for i in `find /home/ubuntu/Perl-SADI/cgi -type f -print`; do perl -pi -e 's|text/xml|application/rdf\+xml|g' $i; done> 
+
+If you are on windows, try the following (assuming that your home directory is C:\Users\ubuntu\):
+
+C<for /R %i in ("C:\Users\ubuntu\Perl-SADI\cgi\*") do perl -pi -e 's|text/xml|application/rdf\+xml|g' %i>
+
 =head1 SYNOPSIS
 
-  # to get started, run the install script
-  sadi-install.pl
+       # to get started, run the install script
+       sadi-install.pl
 
-  # generate a service definition file, for example HelloSadiWorld
-  sadi-generate-services.pl -D HelloSadiWorld
+       # generate a service definition file, for example HelloSadiWorld
+       sadi-generate-services.pl -D HelloSadiWorld
 
-  # generate a service implementation, for example HelloSadiWorld
-  sadi-generate-services.pl HelloSadiWorld
+       # now you have to go and edit the definition file
+       # in Perl-SADI/definitions/HelloSadiWorld
+       # to point it to the various ontologies that your service uses
+       # once you have done that, then...
 
-  # add your business logic to the module services/Service/HelloSadiWorld.pm
+       # generate a service implementation, based on this edited
+       # definitions file.  In this example, you would simply type:
 
-  # assuming that you deployed it, test the service (-g gets the service interface)
-  sadi-testing-service.pl -g http://localhost/cgi-bin/HelloSadiWorld
+       sadi-generate-services.pl HelloSadiWorld
 
-  # read the POD for more details!
+       # now add your business logic to the module that was created in
+       # Perl-SADI/services/Service/HelloSadiWorld.pm
+
+       # finally, make a symbolic link from Perl-SADI/cgi/HelloSadiWorld to
+       # your cgi-bin/ directory to deploy your service.
+
+       # assuming that you deployed it, test the service (-g gets the service interface
+       # while -e allows you to send input data to the service)
+       sadi-testing-service.pl -g http://localhost/cgi-bin/HelloSadiWorld
+
+       # read the POD for more details!
 
 =head1 DESCRIPTION
 
@@ -417,6 +435,8 @@ Created install directory &apos;/home/ubuntu/Perl-SADI&apos;.
 Created install directory &apos;/home/ubuntu/Perl-SADI/cgi&apos;.
 Created sample-resources directory &apos;/home/ubuntu/Perl-SADI/sample-resources&apos;.
 Created service defintions directory &apos;/home/ubuntu/Perl-SADI/definitions&apos;.
+Created service defintions directory &apos;/home/ubuntu/Perl-SADI/unittest&apos;.
+Created service defintions directory &apos;/home/ubuntu/Perl-SADI/xml&apos;.
 
 Log properties file created: &apos;/home/ubuntu/Perl-SADI/log4perl.properties&apos;.
 
@@ -439,6 +459,10 @@ All these things can be done manually, at any time. Installation script just mak
 	* It creates a directory called 'Perl-SADI' in your user directory.
 	Perl SADI will stop working if you move this directory because it 
 	contains vital configuration information inside it.
+	
+	* It creates sub directories in the 'Perl-SADI' directory for places
+	to store your service definitions, generated code, example service
+	input, etc.
 
     * It creates two empty log files Perl-SADI/services.log and
 	Perl-SADI/parser.log - unless they already exist. In any case,
@@ -1204,7 +1228,7 @@ re-create it. Here is a whole script (for HelloSadiWorld):
 # It includes some hard-coded paths - they were added during the
 # generate service call.
 #
-# $Id: SADI.pm,v 1.33 2010-01-21 19:20:11 ubuntu Exp $
+# $Id: SADI.pm,v 1.36 2010-03-09 18:04:43 ubuntu Exp $
 # Contact: Edward Kawas &lt;edward.kawas@gmail.com&gt;
 # ---------------------------------------------------------------
 

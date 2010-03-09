@@ -15,8 +15,10 @@
       authoritative - whether or not the service is authoritative
       authority - the service authority URI
       sigURL - the url to the service signature
+      tests - an array SADI::Service::UnitTest
 -%]
 [% SET COUNTER = 0 %]
+[% SET TEST_COUNTER = 1 %]
 <?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF
  xmlns="http://www.w3.org/2002/07/owl#"
@@ -34,7 +36,7 @@
     <b:format>[% format %]</b:format>
     <b:identifier>[% id %]</b:identifier>
     <a:locationURI>[% url %]</a:locationURI>
-    <a:hasServiceDescriptionText>[% desc %]</a:hasServiceDescriptionText>
+    <a:hasServiceDescriptionText>[% FILTER xml %][% desc %][% END %]</a:hasServiceDescriptionText>
     [%- IF sigURL == '' %]
     <a:hasServiceDescriptionLocation/>[% ELSE %]
     <a:hasServiceDescriptionLocation>[% sigURL %]</a:hasServiceDescriptionLocation>[%END%]
@@ -72,7 +74,24 @@
                         <rdf:Description rdf:about="[% output %]"/>
                     </a:objectType>
                 </rdf:Description>
-            </a:outputParameter>
+            </a:outputParameter>[% FOREACH test IN tests %]
+            <a:hasUnitTest>
+                    <rdf:Description rdf:about="[% name %]_[% authority %]_TEST_[% GET TEST_COUNTER %]">[% SET TEST_COUNTER = TEST_COUNTER + 1 %]
+                        <rdf:type rdf:resource="http://www.mygrid.org.uk/mygrid-moby-service#unitTest"/>
+[%- IF test.regex != '' %]
+                        <a:validREGEX>[% FILTER xml %][%- test.regex -%][% END %]</a:validREGEX>[% END %]
+[%- IF test.xpath != '' %]
+                        <a:validXPath>[% FILTER xml %][%- test.xpath -%][% END %]</a:validXPath>[% END %]
+[%- IF test.input != '' %]
+    [%- SET file = test.input %]
+                        <a:exampleInput>[%- FILTER xml -%][%- TRY -%][%- INSERT $file -%]
+    [%- CATCH -%][%-  test.input  -%][%- END -%][%- END -%]</a:exampleInput>[% END %]
+[%- IF test.output != '' %]
+    [%- SET file = test.output %]
+                        <a:validOutputXML>[%- FILTER xml -%][%- TRY -%][%- INSERT $file -%]
+    [%- CATCH -%][%-  test.output  -%][% END %][%- END -%]</a:validOutputXML>[% END %]
+                    </rdf:Description>
+            </a:hasUnitTest>[% END %]
         </rdf:Description>
     </a:hasOperation>
   </rdf:Description>

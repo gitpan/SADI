@@ -2,7 +2,7 @@
 #
 # Prepare the stage...
 #
-# $Id: sadi-install.pl,v 1.5 2010-01-21 15:57:01 ubuntu Exp $
+# $Id: sadi-install.pl,v 1.7 2010-03-09 16:39:14 ubuntu Exp $
 # Contact: Edward Kawas <edward.kawas+sadi@gmail.com>
 # -----------------------------------------------------------
 
@@ -245,7 +245,43 @@ eval {
        and print FHO 'This directory contains the temporary files needed to run asynchronous SADI services.';
     close(FHO);
 };
-say $@ ? $@ : "Created service async directory '$sadi_home/async'.";
+say $@ ? $@ : "Created service async directory '$async_dir'.";
+
+# create unit test directory if necessary
+my $unittest_dir = $SADICFG::UNITTEST_DIR || "$sadi_home/unittest";
+eval {
+    my ( $v, $d, $f ) = File::Spec->splitpath( $unittest_dir );
+    my $dir = File::Spec->catdir($v);
+    foreach my $part ( File::Spec->splitdir( ( $d . $f ) ) ) {
+        $dir = File::Spec->catdir( $dir, $part );
+        next if -d $dir or -e $dir;
+        mkdir($dir)
+          || die( "Error creating service unit test directory '" . $dir . "':\n$!" );
+    }
+    chmod 0777, $unittest_dir;
+    open (FHO,">$unittest_dir/README") 
+       and print FHO 'This directory contains unit tests for your SADI services.';
+    close(FHO);
+};
+say $@ ? $@ : "Created unit test directory '$unittest_dir'.";
+
+# create directory for xml that user can store input/output in, if necessary
+my $xmlin_dir = "$sadi_home/xml";
+eval {
+    my ( $v, $d, $f ) = File::Spec->splitpath( $xmlin_dir );
+    my $dir = File::Spec->catdir($v);
+    foreach my $part ( File::Spec->splitdir( ( $d . $f ) ) ) {
+        $dir = File::Spec->catdir( $dir, $part );
+        next if -d $dir or -e $dir;
+        mkdir($dir)
+          || die( "Error creating xml directory '" . $dir . "':\n$!" );
+    }
+    chmod 0777, $unittest_dir;
+    open (FHO,">$xmlin_dir/README") 
+       and print FHO 'This directory is a place to put your example in/outputs for your SADI services.';
+    close(FHO);
+};
+say $@ ? $@ : "Created example xml directory '$xmlin_dir'.";
 
 # log files (create, or just change their write permissions)
 my $log_file1 = $SADICFG::LOG_FILE
@@ -336,7 +372,8 @@ if ( -e $config_file and !$opt_F ) {
 						   '@GENERATED_DIR@'    => $generated_dir,
 						   '@SERVICES_DIR@'     => $services_dir,
 						   '@DEFINITIONS_DIR@'  => $definitions_dir,
-						   '@ASYNC_OUTDIR@'     => $async_dir, 
+						   '@ASYNC_OUTDIR@'     => $async_dir,
+						   '@UNIT_TEST_DIR@'   => $unittest_dir,
 						   '@HOME_DIR@'         => $sadi_home,
 						   '@LOG4PERL_FILE@'    => $log4perl_file,
 						   '@LOGFILE@'          => $log_file1,

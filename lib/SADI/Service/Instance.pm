@@ -4,7 +4,7 @@
 #
 # For copyright and disclaimer see below.
 #
-# $Id: Instance.pm,v 1.4 2010-01-07 21:58:21 ubuntu Exp $
+# $Id: Instance.pm,v 1.5 2010-03-08 19:29:02 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::Service::Instance;
 
@@ -14,7 +14,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.5 $ =~ /: (\d+)\.(\d+)/;
 
 =head1 NAME
 
@@ -235,6 +235,7 @@ A url to the SADI service signature.
 		Authoritative => { type => SADI::Base->BOOLEAN },
 		Format        => { type => SADI::Base->STRING },
 		SignatureURL  => { type => SADI::Base->STRING },
+		UnitTest     => { type => 'SADI::Service::UnitTest', is_array => 1 },
 	);
 
 	sub _accessible {

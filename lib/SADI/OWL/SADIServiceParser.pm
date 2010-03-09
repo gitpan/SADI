@@ -3,7 +3,7 @@
 # Author: Edward Kawas <edward.kawas@gmail.com>,
 # For copyright and disclaimer see below.
 #
-# $Id: SADIServiceParser.pm,v 1.3 2010-01-07 21:30:34 ubuntu Exp $
+# $Id: SADIServiceParser.pm,v 1.4 2010-03-08 19:28:53 ubuntu Exp $
 #-----------------------------------------------------------------
 package SADI::OWL::SADIServiceParser;
 use strict;
@@ -16,6 +16,7 @@ use RDF::Core::Resource;
 
 use SADI::Utils;
 use SADI::Service::Instance;
+use SADI::Service::UnitTest;
 
 use SADI::RDF::Predicates::DC_PROTEGE;
 use SADI::RDF::Predicates::OMG_LSID;
@@ -26,7 +27,7 @@ use SADI::RDF::Predicates::RDFS;
 use LS::ID;
 
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.3 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /: (\d+)\.(\d+)/;
 
 =pod
 
@@ -371,6 +372,72 @@ sub getServices {
 
 		# dont need the performsTask node anymore
 		$performs = undef;
+
+		# process any unit test information
+        my $unit_test =
+          $model->getObjects(
+                              $hasOperation,
+                              new RDF::Core::Resource(
+                                        SADI::RDF::Predicates::FETA->hasUnitTest
+                              )
+          );
+        $unit_test = [] unless @$unit_test;
+        foreach my $ut (@$unit_test) {
+            my $unit = new SADI::Service::UnitTest;
+
+            # get example input
+            $val =
+              $model->getObjects(
+                                  $ut,
+                                  new RDF::Core::Resource(
+                                       SADI::RDF::Predicates::FETA->exampleInput
+                                  )
+              );
+            $val = "" unless $$val[0];
+            $val = $$val[0]->getValue if ref($val) eq 'ARRAY' and $$val[0];
+            $unit->input( SADI::Utils::trim($val) );
+
+            # get example output
+            $val =
+              $model->getObjects(
+                                  $ut,
+                                  new RDF::Core::Resource(
+                                                     SADI::RDF::Predicates::FETA
+                                                       ->validOutputXML
+                                  )
+              );
+            $val = "" unless $$val[0];
+            $val = $$val[0]->getValue if ref($val) eq 'ARRAY' and $$val[0];
+            $unit->output( SADI::Utils::trim($val) );
+
+            # get regex
+            $val =
+              $model->getObjects(
+                                  $ut,
+                                  new RDF::Core::Resource(
+                                         SADI::RDF::Predicates::FETA->validREGEX
+                                  )
+              );
+            $val = "" unless $$val[0];
+            $val = $$val[0]->getValue if ref($val) eq 'ARRAY' and $$val[0];
+            $unit->regex( SADI::Utils::trim($val) );
+
+            # get xpath
+            $val =
+              $model->getObjects(
+                                  $ut,
+                                  new RDF::Core::Resource(
+                                         SADI::RDF::Predicates::FETA->validXPath
+                                  )
+              );
+            $val = "" unless $$val[0];
+            $val = $$val[0]->getValue if ref($val) eq 'ARRAY' and $$val[0];
+            $unit->xpath( SADI::Utils::trim($val) );
+
+            # add the unit test in the service
+            push @{ $instance->UnitTest }, $unit;
+        }
+
 
 		# this service is done ...
 		push @services, $instance;

@@ -6,6 +6,7 @@ bin/scripts/sadi-testing-service.pl
 Changes
 doc/async_service.html
 doc/async_service_auto_advanced.html
+doc/create_unit_tests.html
 doc/sync_service.html
 doc/sync_service_advanced.html
 doc/sync_service_auto_advanced.html
@@ -52,6 +53,7 @@ lib/SADI/Generators/templates/service-cgi.tt
 lib/SADI/Generators/templates/service-definition.tt
 lib/SADI/Generators/templates/service-error.tt
 lib/SADI/Generators/templates/service-signature.tt
+lib/SADI/Generators/templates/service-unit-test.tt
 lib/SADI/Generators/templates/service.tt
 lib/SADI/OWL/OntologyParser.pm
 lib/SADI/OWL/SADIServiceParser.pm
@@ -65,6 +67,7 @@ lib/SADI/RDF/Predicates/RDFS.pm
 lib/SADI/SADI.pm
 lib/SADI/Service/Instance.pm
 lib/SADI/Service/ServiceBase.pm
+lib/SADI/Service/UnitTest.pm
 lib/SADI/Utils.pm
 LICENSE
 Makefile.PL

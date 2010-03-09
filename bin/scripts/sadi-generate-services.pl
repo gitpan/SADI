@@ -2,14 +2,14 @@
 #
 # Generate services.
 #
-# $Id: sadi-generate-services.pl,v 1.2 2009-09-10 14:34:33 ubuntu Exp $
+# $Id: sadi-generate-services.pl,v 1.3 2010-03-09 16:39:14 ubuntu Exp $
 # Contact: edward kawas <edward.kawas+sadi@gmail.com>
 # -----------------------------------------------------------
 
 # some command-line options
 use Getopt::Std;
-use vars qw/ $opt_h $opt_A $opt_B $opt_d $opt_v  $opt_s $opt_b $opt_F $opt_S $opt_D /;
-getopts('hdvsbFSADB');
+use vars qw/ $opt_h $opt_A $opt_B $opt_d $opt_v  $opt_s $opt_b $opt_F $opt_S $opt_D $opt_T/;
+getopts('hdvsbFSADBT');
 
 # usage
 if ( $opt_h or @ARGV == 0 ) {
@@ -19,23 +19,25 @@ Usage: [-vds] [-b|S|A|D] service-name [service-name...]
 
     All parameters for generating services are taken from the 
    'sadi-service.cfg' configuration file.
-       
+
     -b ... generate base[s] of given service[s]
     -B ... generate asynchronous base[s] of given service[s]
-    
+
     -S ... generate implementation and the base of service[s], the
            implementation module has enabled option to read the base
            statically (that is why it is also generated here)
     -A ... generate an asynchronous based implementation of the given service
-    
+
     -D ... generate a definition file for the service that you can fill in       
-    
+
+    -T ... generate a unit test for your service that you can fill in       
+
     If none of {-b,-S} given, it generates/show implementation (not a base) of 
     service[s].
 
     -s ... show generated code on STDOUT
            (no file is created, disabled when -a given)
-           
+
     -v ... verbose
     -d ... debug
     -h ... help
@@ -89,7 +91,12 @@ if ($opt_s) {
 		# generate a definition file to fill in
 		$generator->generate_definition( service_names => [@ARGV],
 										 outcode       => \$code );
-	} else {
+	} elsif ($opt_T) {
+
+        # generate a unit test file to fill in
+        $generator->generate_unit_test( service_names => [@ARGV],
+                                        outcode       => \$code );
+    }else {
 
 		# generate impl/cgi
 		$generator->generate_impl( service_names => [@ARGV],
@@ -131,7 +138,12 @@ if ($opt_s) {
 		# generate a definition file to fill in
 		$generator->generate_definition( service_names => [@ARGV],
 										 force_over    => $opt_F );
-	} else {
+	} elsif ($opt_T) {
+
+        # generate a unit test file to fill in
+        $generator->generate_unit_test( service_names => [@ARGV],
+                                         force_over    => $opt_F );
+    } else {
 
 		# generate impl/cgi
 		$generator->generate_impl( service_names => [@ARGV],

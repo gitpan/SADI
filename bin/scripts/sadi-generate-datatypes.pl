@@ -2,7 +2,7 @@
 #
 # Generate perl modules from OWL files.
 #
-# $Id: sadi-generate-datatypes.pl,v 1.65 2010-01-27 19:58:57 ubuntu Exp $
+# $Id: sadi-generate-datatypes.pl,v 1.70 2010-02-11 18:16:44 ubuntu Exp $
 # Contact: Edward Kawas <edward.kawas+SADI@gmail.com>
 # -----------------------------------------------------------
 # some command-line options
@@ -71,6 +71,8 @@ sub say { print @_, "\n"; }
 my %imports_added;
 say "Output is going to $opt_o\n" if $opt_o;
 
+say "Using SAX parser $SADICFG::XML_PARSER" if defined $SADICFG::XML_PARSER and $opt_v;
+
 if (@ARGV) {
 	foreach my $arg (@ARGV) {
 		say 'Generating perl modules for: ' . $arg;
@@ -79,7 +81,12 @@ if (@ARGV) {
 		if ($opt_u) {
 			say 'Downloading OWL file';
 			my $owl = SADI::Utils::getHttpRequestByURL($arg);
-			my ( $statements, $imports ) = ODO::Parser::XML->parse($owl, base_uri => $arg);
+			my ( $statements, $imports ) = 
+			     ODO::Parser::XML->parse(
+			         $owl, 
+			         base_uri => $arg,
+			         sax_parser => defined $SADICFG::XML_PARSER ? $SADICFG::XML_PARSER : undef
+			     );
 			$GRAPH_schema->add($statements);
 			$imports_added{$arg} = 1;
 			# process imports
@@ -103,7 +110,10 @@ if (@ARGV) {
                 $tmp =~ s/#*$//gi;
                 $base_uri = $tmp;
 			}
-			my ( $statements, $imports ) = ODO::Parser::XML->parse_file($arg, base_uri => $base_uri);
+			my ( $statements, $imports ) = ODO::Parser::XML->parse_file($arg, 
+			 base_uri => $base_uri, 
+			 sax_parser => defined $SADICFG::XML_PARSER ? $SADICFG::XML_PARSER : undef
+			);
 			$GRAPH_schema->add($statements);
 			if ($opt_i) {
 				foreach my $i (@$imports) {
@@ -116,11 +126,13 @@ if (@ARGV) {
 		}
 
 		# create the 'stuff'
+		say('Aggregating ontologies ...') if $opt_v;
 		my $SCHEMA =
 		  ODO::Ontology::OWL::Lite->new(
 										 graph        => $GRAPH_source_data,
 										 schema_graph => $GRAPH_schema,
 										 schemaName   => '',
+										 verbose      => $opt_v
 		  );
 		if ($opt_s) {
 			my $code = '';
@@ -137,7 +149,10 @@ sub process_import {
 	$import =~ s/#*$//gi;
 	say ("\tProcessing import $import");
 	my $owl = SADI::Utils::getHttpRequestByURL($import);
-	my ( $statements, $imports ) = ODO::Parser::XML->parse($owl, base_uri => $import);
+	my ( $statements, $imports ) = ODO::Parser::XML->parse($owl, 
+	   base_uri => $import, 
+	   sax_parser => defined $SADICFG::XML_PARSER ? $SADICFG::XML_PARSER : undef
+	);
 	$GRAPH_schema->add($statements);
 	foreach my $i (@$imports) {
 		$i =~ s/#*$//gi;
@@ -152,12 +167,15 @@ sub generate_datatypes {
 	my ( $lite, $code ) = @_;
 
 	# process the object properties
+	say ("\tProcessing object properties") if $opt_v;
 	my $oProps = &_process_object_properties( $lite, $code );
 
 	# process the datatype properties
+	say ("\tProcessing datatype properties") if $opt_v;
 	my $dProps = &_process_datatype_properties( $lite, $code );
 
 	# process the owl classes
+	say ("\tProcessing owl classes") if $opt_v;
 	&_process_classes( $lite, $oProps, $dProps, $code );
 }
 
