@@ -21,7 +21,7 @@ use strict;
 
 # add versioning to this module
 use vars qw /$VERSION/;
-$VERSION = sprintf "%d.%02d", q$Revision: 1.19 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.20 $ =~ /: (\d+)\.(\d+)/;
 
 #-----------------------------------------------------------------
 # A list of allowed attribute names. See SADI::Base for details.
@@ -360,6 +360,7 @@ sub generate_impl {
 		service_names => [],
 		force_over    => 0,
 		static_impl   => 0,
+		do_owl2perl   => 1, # try to use owl2perl datatypes by default
 
 		# other args, with no default values
 		# authority     => 'authority'
@@ -389,6 +390,41 @@ sub generate_impl {
 										'service.tt' );
 	foreach my $obj (@$services) {
 		my $name = $obj->ServiceName;
+		my $outputClass = '';
+		my (@obj_prop, @dat_prop);
+		if ($args{do_owl2perl}) {
+			use lib $SADICFG::GENERATORS_OUTDIR;
+			# convert the outputclass to a module name
+			$outputClass = $self->owlClass2module( $self->uri2package($obj->OutputClass) );
+			
+			eval "require $outputClass";
+			# error: dont put owl2perl in the service skeleton
+			if ($@) {
+			 $args{do_owl2perl} = 0;
+			 $LOG->warn($@);
+			}
+			if ($args{do_owl2perl}) {
+				my @inheritance = &__inheritance($outputClass->new);
+				# get the unique fields
+				my %seen = ();
+				my @unique = grep { ! $seen{$_} ++ } @inheritance;
+				
+				foreach (@unique) {
+				    # fetch names of datatype properties
+				    eval {
+				    	my @dp = @{$_->__properties->{datatypes}} if defined $_->__properties->{datatypes} ;
+				        push @dat_prop, @dp;
+				    };
+				    $LOG->warn ($@) if $@;
+				    # fetch object properties
+				    eval {
+				    	my @op = @{$_->__properties->{objects}} if defined $_->__properties->{objects};
+				        push @obj_prop, @op;
+				    };
+				    $LOG->warn ($@) if $@;
+				}
+			}
+		}
 		$LOG->debug("\tGenerating impl for $name\n");
 		my $module_name =
 		  $self->service2module( $obj->Authority, $obj->ServiceName );
@@ -401,11 +437,16 @@ sub generate_impl {
 			$tt->process(
 						  $input,
 						  {
-							 base        => $obj,
-							 impl        => $impl,
-							 static_impl => $args{static_impl},
-							 module_name => $module_name,
-						  },
+							 base               => $obj,
+							 impl               => $impl,
+							 static_impl        => $args{static_impl},
+							 module_name        => $module_name,
+							 is_async           => defined $args{is_async} ? $args{is_async} : 0,
+							 do_owl2perl        => $args{do_owl2perl},
+							 owl2perl_datatypes => \@dat_prop,  
+							 owl2perl_objects   => \@obj_prop,
+							 owl2perl_outclass  => $outputClass,
+ 						  },
 						  $args{outcode}
 			) || $LOG->logdie( $tt->error() );
 		} else {
@@ -423,106 +464,128 @@ sub generate_impl {
 			$tt->process(
 						  $input,
 						  {
-							 base        => $obj,
-							 impl        => $impl,
-							 static_impl => $args{static_impl},
-							 module_name => $module_name,
+							 base               => $obj,
+							 impl               => $impl,
+							 static_impl        => $args{static_impl},
+							 module_name        => $module_name,
+							 is_async           => defined $args{is_async} ? $args{is_async} : 0,
+							 do_owl2perl        => $args{do_owl2perl},
+                             owl2perl_datatypes => \@dat_prop,  
+                             owl2perl_objects   => \@obj_prop,
+                             owl2perl_outclass  => $outputClass,
 						  },
 						  $outfile
 			) || $LOG->logdie( $tt->error() );
 			$LOG->debug("Created $outfile\n");
 		}
 	}
+}
+
+# extracts all of the parent names from  an OWL2Perl generated datatype
+sub __inheritance {
+    my $self = $_[0];    
+    my $class = ref($self) || $self;
+    return unless $class;
+    no strict;
+    my @parent_classes = @{$class . '::ISA'};
+
+    my %hash;
+    my @ordered_inheritance;
+    push @ordered_inheritance, $class;
+    foreach my $parent_class (@parent_classes) {
+        push @ordered_inheritance, $parent_class, ($parent_class eq 'OWL::Data::OWL::Class' ? () : __inheritance($parent_class) );
+    }
+    return @ordered_inheritance;
 }
 
 #-----------------------------------------------------------------
 # generate_async_impl
 #-----------------------------------------------------------------
-sub generate_async_impl {
-	my ( $self, @args ) = @_;
-	my %args = (    # some default values
-		impl_outdir => (
-						 $SADICFG::GENERATORS_IMPL_OUTDIR
-						   || SADI::Utils->find_file( $Bin, 'services' )
-		),
-		impl_prefix   => $SADICFG::GENERATORS_IMPL_PACKAGE_PREFIX,
-		service_names => [],
-		force_over    => 0,
-		static_impl   => 0,
-
-		# other args, with no default values
-		# authority     => 'authority'
-		# outcode       => ref SCALAR
-		# and the real parameters
-		@args
-	);
-	$self->_check_outcode(%args);
-	my $outdir = File::Spec->rel2abs( $args{impl_outdir} );
-	$LOG->debug( "Arguments for generating async service implementation:\n"
-				 . $self->toString( \%args ) )
-	  if ( $LOG->is_debug );
-	my @names = ();
-	push( @names, @{ $args{service_names} } )
-	  if defined $args{service_names};
-	my $services = $self->read_services(@names);
-	if ( scalar @$services == 0 ) {
-		my $msg = "Didn't find any services for @names!"
-		  . "\nPlease make sure that you create a service definition first!";
-		$LOG->warn($msg);
-		$self->throw($msg);
-	}
-
-	# generate from template
-	my $tt = Template->new( ABSOLUTE => 1 );
-	my $input = SADI::Utils->find_file( $Bin, 'SADI', 'Generators', 'templates',
-										'service-async.tt' );
-	foreach my $obj (@$services) {
-		my $name = $obj->ServiceName;
-		$LOG->debug("\tGenerating impl for $name\n");
-		my $module_name =
-		  $self->service2module( $obj->Authority, $obj->ServiceName );
-
-		#   print SADI::Base->toString (\%input_paths);
-		# create implementation specific object
-		my $impl =
-		  { package => ( $args{impl_prefix} || 'Service' ) . '::' . $name, };
-		if ( $args{outcode} ) {
-			$tt->process(
-						  $input,
-						  {
-							 base        => $obj,
-							 impl        => $impl,
-							 static_impl => $args{static_impl},
-							 module_name => $module_name,
-						  },
-						  $args{outcode}
-			) || $LOG->logdie( $tt->error() );
-		} else {
-			my $outfile =
-			  File::Spec->catfile( $outdir, split( /::/, $impl->{package} ) )
-			  . '.pm';
-
-			# do not overwrite an existing file (there may be already
-			# a real implementation code)
-			if ( -f $outfile and !$args{force_over} ) {
-				$LOG->logwarn( "Implementation '$outfile' already exists. "
-						 . "It will *not* be re-generated. Safety reasons.\n" );
-				next;
-			}
-			$tt->process(
-						  $input,
-						  {
-							 base        => $obj,
-							 impl        => $impl,
-							 static_impl => $args{static_impl},
-							 module_name => $module_name,
-						  },
-						  $outfile
-			) || $LOG->logdie( $tt->error() );
-			$LOG->debug("Created $outfile\n");
-		}
-	}
-}
+#sub generate_async_impl {
+#	my ( $self, @args ) = @_;
+#	my %args = (    # some default values
+#		impl_outdir => (
+#						 $SADICFG::GENERATORS_IMPL_OUTDIR
+#						   || SADI::Utils->find_file( $Bin, 'services' )
+#		),
+#		impl_prefix   => $SADICFG::GENERATORS_IMPL_PACKAGE_PREFIX,
+#		service_names => [],
+#		force_over    => 0,
+#		static_impl   => 0,
+#
+#		# other args, with no default values
+#		# authority     => 'authority'
+#		# outcode       => ref SCALAR
+#		# and the real parameters
+#		@args
+#	);
+#	$self->_check_outcode(%args);
+#	my $outdir = File::Spec->rel2abs( $args{impl_outdir} );
+#	$LOG->debug( "Arguments for generating async service implementation:\n"
+#				 . $self->toString( \%args ) )
+#	  if ( $LOG->is_debug );
+#	my @names = ();
+#	push( @names, @{ $args{service_names} } )
+#	  if defined $args{service_names};
+#	my $services = $self->read_services(@names);
+#	if ( scalar @$services == 0 ) {
+#		my $msg = "Didn't find any services for @names!"
+#		  . "\nPlease make sure that you create a service definition first!";
+#		$LOG->warn($msg);
+#		$self->throw($msg);
+#	}
+#
+#	# generate from template
+#	my $tt = Template->new( ABSOLUTE => 1 );
+#	my $input = SADI::Utils->find_file( $Bin, 'SADI', 'Generators', 'templates',
+#										'service-async.tt' );
+#	foreach my $obj (@$services) {
+#		my $name = $obj->ServiceName;
+#		$LOG->debug("\tGenerating impl for $name\n");
+#		my $module_name =
+#		  $self->service2module( $obj->Authority, $obj->ServiceName );
+#
+#		#   print SADI::Base->toString (\%input_paths);
+#		# create implementation specific object
+#		my $impl =
+#		  { package => ( $args{impl_prefix} || 'Service' ) . '::' . $name, };
+#		if ( $args{outcode} ) {
+#			$tt->process(
+#						  $input,
+#						  {
+#							 base        => $obj,
+#							 impl        => $impl,
+#							 static_impl => $args{static_impl},
+#							 module_name => $module_name,
+#						  },
+#						  $args{outcode}
+#			) || $LOG->logdie( $tt->error() );
+#		} else {
+#			my $outfile =
+#			  File::Spec->catfile( $outdir, split( /::/, $impl->{package} ) )
+#			  . '.pm';
+#
+#			# do not overwrite an existing file (there may be already
+#			# a real implementation code)
+#			if ( -f $outfile and !$args{force_over} ) {
+#				$LOG->logwarn( "Implementation '$outfile' already exists. "
+#						 . "It will *not* be re-generated. Safety reasons.\n" );
+#				next;
+#			}
+#			$tt->process(
+#						  $input,
+#						  {
+#							 base        => $obj,
+#							 impl        => $impl,
+#							 static_impl => $args{static_impl},
+#							 module_name => $module_name,
+#						  },
+#						  $outfile
+#			) || $LOG->logdie( $tt->error() );
+#			$LOG->debug("Created $outfile\n");
+#		}
+#	}
+#}
 
 #-----------------------------------------------------------------
 # generate_cgi
