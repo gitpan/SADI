@@ -8,8 +8,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: 6.42
 distribution_type: module
-generated_by: 'Module::Install version 0.91'
-license: 'new BSD'
+generated_by: 'Module::Install version 1.00'
+license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
@@ -44,4 +44,6 @@ requires:
   URI: 1.4
   Unicode::String: 2.09
   Want: 0.18
-version: 1.04
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+version: 1.05
