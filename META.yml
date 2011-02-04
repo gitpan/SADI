@@ -1,7 +1,7 @@
 ---
 abstract: 'This distribution aids in the creation of SADI perl based web services.'
 author:
-  - '=begin html'
+  - "=begin html\r"
 build_requires:
   ExtUtils::MakeMaker: 6.42
   Test::More: 0.42
@@ -34,10 +34,9 @@ requires:
   HTTP::Request: 0
   IO::Prompt: 0.99.2
   IO::String: 1.08
-  LS: 1.1.7
   LWP: 0
   Log::Log4perl: 1.12
-  OWL2Perl: 0.97
+  OWL2Perl: 0.98.1
   Params::Util: 0.38
   RDF::Core: 0.51
   Template: 2.22
@@ -46,4 +45,4 @@ requires:
   Want: 0.18
 resources:
   license: http://opensource.org/licenses/bsd-license.php
-version: 1.05
+version: 1.06
