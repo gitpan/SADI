@@ -7,6 +7,7 @@ Changes
 doc/async_service.html
 doc/async_service_auto_advanced.html
 doc/create_unit_tests.html
+doc/install_windows_64.html
 doc/sync_service.html
 doc/sync_service_advanced.html
 doc/sync_service_auto_advanced.html
@@ -85,6 +86,7 @@ t/SADI-Config.t
 t/SADI-Datatypes.t
 t/SADI-FileStore.t
 t/SADI-OWL-SADIServiceParser.t
+t/SADI-RDF-Core.t
 t/SADI-Service-Instance.t
 t/sadi-services.cfg
 t/SADI-Utils.t

@@ -10,19 +10,26 @@ BEGIN {
 
     # some command-line options
     use Getopt::Std;
-    use vars qw/ $opt_h $opt_d $opt_v $opt_l $opt_e $opt_g $opt_p/;
-    getopts('hdvl:e:g:C:a:p');
+    use vars qw/ $opt_h $opt_d $opt_v $opt_l $opt_e $opt_g $opt_p $opt_n $opt_t /;
+    getopts('hdvl:e:g:pnt');
 
     # usage
     if ( $opt_h or ( not $opt_e and not $opt_g and scalar @ARGV == 0) ) {
         print STDOUT <<'END_OF_USAGE';
 Calling SADI services remotely or locally.
 
-   Usage: # calling a local module representing a service
-       [-vd] [-l <lib-location>] <package-name> [<input-file>]
+   Usage: 
+       # calling a local module representing a service
+       [-vd] -l <lib-location>] <package-name> [<input-file>]
+
+       # 'POST'ing to a service
+       [-vd] -l <lib-location>] [-p] -e <service-url> <input-file>
+
+       # 'GET'ting to a service
+       [-vd] -l <lib-location>] [-p] -g <service-url>
 
        # calling a real service, using HTTP
-       -e <service-url> <service-name> [<input-file>]
+       -e <service-url> [<input-file>]
 
        # calling a real service to obtain service interface
        -g <service-url>
@@ -48,6 +55,10 @@ Calling SADI services remotely or locally.
 
     -p ... if the service is asynchronous, keep checking the
            service for a result.
+
+    -n ... send data as n3
+
+    -t ... request data as n3
 
     -v ... verbose
     -d ... debug
@@ -81,6 +92,11 @@ END_OF_USAGE
         $LOG->level('INFO')  if $opt_v;
         $LOG->level('DEBUG') if $opt_d;
     }
+    if ($opt_n) {
+        # can we output n3?
+        eval "use RDF::Notation3; 1;"
+          or die "$@\n";
+    }
 
 }
 
@@ -102,6 +118,12 @@ if ($opt_e) {
 
     # calling a real service, using HTTP Post
     my $req = HTTP::Request->new( POST => $opt_e );
+    if ($opt_n) {
+    	$req->content_type('text/rdf+n3');	
+    }
+    if ($opt_t) {
+    	$req->header(Accept => "text/rdf+n3");
+    }
     my $ua = LWP::UserAgent->new;
     my $input = '';
     if ( @ARGV > 0 ) {
@@ -132,12 +154,20 @@ if ($opt_e) {
     # calling a real SADI service, using HTTP Get
     my $ua = LWP::UserAgent->new;
     my $req = HTTP::Request->new( GET => $opt_g );
+    if ($opt_n) {
+    	# set content type in case we are not just asking for the signature
+        $req->content_type('text/rdf+n3');  
+    }
+    if ($opt_t) {
+        $req->header(Accept => "text/rdf+n3");
+    }
     my $response = $ua->request($req);
     print "\n" . $response->as_string . "\n";
     if ($opt_p) {
         if ($response->status_line =~ m/202|302/
          or ($response->header('pragma') 
-         and $response->header('pragma') =~ m/sadi-please-wait/)) {
+         and $response->header('pragma') =~ m/sadi-please-wait/)
+         or ($response->header('Retry-After'))) {
             print "\nAsynchronous service detected ... Going to attempt to poll service!\n" if $opt_d or $opt_v;
             &_poll_until_done($response->content);
         }
@@ -170,17 +200,26 @@ sub _poll_until_done {
     require RDF::Core::Storage::Memory;
     require RDF::Core::Model::Parser;
     require RDF::Core::Resource;
+    require RDF::Notation3::RDFCore;
+
     my $storage = new RDF::Core::Storage::Memory;
     my $model = new RDF::Core::Model (Storage => $storage);
     
-    my %options = (Model => $model,
-              Source => $content,
-              SourceType => 'string',
-              BaseURI => "http://www.foo.com/",
-    );
-    my $parser = new RDF::Core::Model::Parser(%options);
-    $parser->parse;
-    
+    if ($opt_t) {
+    	# response is n3
+    	my $rdf_n3 = RDF::Notation3::RDFCore->new();
+        $rdf_n3->set_storage($storage);
+        eval{$model = $rdf_n3->parse_string($content);};
+    } else {
+    	# response is rdf/xml
+	    my %options = (Model => $model,
+	              Source => $content,
+	              SourceType => 'string',
+	              BaseURI => "http://www.foo.com/",
+	    );
+        my $parser = new RDF::Core::Model::Parser(%options);
+        $parser->parse;
+    }
     # extract all of the polling urls
     my %urls;
     my $enumerator = $model->getStmts(undef, new RDF::Core::Resource('http://www.w3.org/2000/01/rdf-schema#isDefinedBy') , undef);
@@ -192,7 +231,7 @@ sub _poll_until_done {
     }
     $enumerator->close;
     # free memory
-    $model=undef; $storage = undef; $parser = undef; $enumerator = undef;
+    $model=undef; $storage = undef; $enumerator = undef;
     
     my $sleep_time = 15;
     # now keep polling our unique urls ...
@@ -201,10 +240,17 @@ sub _poll_until_done {
             print "   polling $_\n" if $opt_d or $opt_v;
             my $ua = LWP::UserAgent->new;
             my $req = HTTP::Request->new( GET => $_ );
+            if ($opt_n) {
+		        $req->content_type('text/rdf+n3');  
+		    }
+		    if ($opt_t) {
+		        $req->header(Accept => "text/rdf+n3, */*;q=0.1");
+		    }
             my $response = $ua->request($req);
             unless ($response->status_line =~ m/202|302/ 
                 or ($response->header('pragma') 
-                and $response->header('pragma') =~ m/sadi-please-wait/)) {
+                and $response->header('pragma') =~ m/sadi-please-wait/)
+                or ($response->header('Retry-After'))) {
                 print "\n", $response->as_string, "\n";
                 delete $urls{$_};
             }

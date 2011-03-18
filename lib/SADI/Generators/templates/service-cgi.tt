@@ -50,10 +50,11 @@ if ($ENV{REQUEST_METHOD} eq 'GET' or $ENV{REQUEST_METHOD} eq 'HEAD') {
     # send the signature for this service
 	# instantiate a new SADI::RDF::Core object
  	my $core = SADI::RDF::Core->new;
+ 	$core->ContentType(__PACKAGE__->get_response_content_type());
  	# set the Instance for $core
  	$core->Signature(__PACKAGE__->get_service_signature('[% obj.ServiceName %]'));
  	my $q = new CGI;
-	print $q->header(-type=>'application/rdf+xml');
+	print $q->header(-type=>__PACKAGE__->get_response_content_type());
     print $core->getServiceInterface();
 } else {
     # call the service
@@ -64,7 +65,7 @@ if ($ENV{REQUEST_METHOD} eq 'GET' or $ENV{REQUEST_METHOD} eq 'HEAD') {
     my $x =  __PACKAGE__->[% obj.ServiceName %]($data);
     # print the results
     my $q = new CGI;
-    print $q->header(-type=>'application/rdf+xml');
+    print $q->header(-type=>__PACKAGE__->get_response_content_type());
     print $x;
 }
 
