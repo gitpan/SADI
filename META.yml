@@ -26,10 +26,12 @@ requires:
   Carp: 0
   Class::Inspector: 1.17
   Config::Simple: 4.58
+  Cwd: 3.33
   File::HomeDir: 0.65
   File::Path: 0
   File::ShareDir: 1
-  File::Spec: 0.8
+  File::Spec: 3.33
+  File::Temp: 0.22
   HTTP::Date: 5.81
   HTTP::Request: 0
   IO::Prompt: 0.99.2
@@ -46,4 +48,4 @@ requires:
   Want: 0.18
 resources:
   license: http://opensource.org/licenses/bsd-license.php
-version: 1.08
+version: 1.09
